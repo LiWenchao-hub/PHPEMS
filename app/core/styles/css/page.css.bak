@@ -1,0 +1,75 @@
+@charset "utf-8";
+*{ margin:0px; padding:0px;}
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td { margin:0px; padding:0px;font-family:微软雅黑; font-size:12px; }
+body{behavior:url(csshover.htc);}
+table { border-collapse:collapse; border-spacing:0; }
+fieldset, img { border:0px; }
+address, caption, cite, code, dfn, em, th, var { font-style:normal; font-weight:normal; }
+ol, ul { list-style:none; }
+caption, th { text-align:left; }
+h1, h2, h3, h4, h5, h6 { font-size:100%; font-weight:normal; }
+abbr, acronym { border:0; }
+.clearfix:after{display:block;visibility:hidden;clear:both;height:0;content:"."}.clearfix{zoom:1}
+.clear{ clear:both;}
+.clear1{ clear:both;width:100%; height:38px; font-size:1px;}
+.Hidebox{ display:none;}
+a{ text-decoration:none;}
+a.red{ color:#961000;}
+a.red:hover{ color:#ac0a00;}
+.left{ float:left;}
+
+.w1000{ width:1280px; margin:0px auto;}
+.l-head{ margin-top:30px; position:relative; margin-bottom:20px; _top:30px;}
+.l-head .l-headlogo{float:left;}
+.l-head .l-headlogo a{ margin-right:10px; float:left;}
+.l-head span{ float:right; color:#666; margin-top:15px;}
+.l-head span a{ color:#666;}
+.l-hadlogoline{  position:absolute;background:url(//img.233.com/wx/img/unionadmin/login/login.png) no-repeat right -107px; width:1px; height:38px; position:absolute; left:145px; top:3px;}
+
+.l-loginwapper{ position:relative; z-index:30;}
+.l-login{ background:url(//img.233.com/wx/img/unionadmin/login/login.png) no-repeat left top; width:338px; height:432px; position:absolute; top:-480px; right:0px;}
+.l-logins{ width:271px; text-align:center; margin-top:90px;}
+.l-logins p{ font-size:20px; color:#333; font-weight:200;}
+.l-logins .l-reg{ font-size:12px; height:30px; line-height:30px; color:#444;top:340px;left:60px;position: absolute}
+.top-user-panel { margin-top:12px;  }
+.top-user-panel a { font-size:14px;   }
+.top-user-panel .user-login {position:relative; z-index:2; }
+.top-user-panel .user-name {position:relative; margin-bottom:15px; }
+.top-user-panel .user-pw {position:relative; }
+.top-user-panel .txt { width:170px; height:32px; padding-left:28px;  font-family:"\5B8B\4F53"; line-height:32px; color:#666; border:0px;  border-radius:3px; }
+.top-user-panel .txt:hover{ background:#fbfafa;}
+.top-user-panel .i-icon { background:url(//img.233.com/wx/img/unionadmin/login/login.png) no-repeat right top; width:11px; height:20px; position:absolute; top:5px; left:45px; }
+.top-user-panel .user-pw .i-icon { background:url(//img.233.com/wx/img/unionadmin/login/login.png) no-repeat right -52px; width:12px; height:17px; position:absolute; top:7px;}
+.top-user-panel .submit { position:relative; }
+.top-user-panel .btn { width:95px; height:38px; line-height:38px; color:#fff; border-radius:3px; background-color:#e3271b; display:block;  position:relative; font-size:18px; margin:12px 0px 0px 88px; }
+.top-user-panel .btn:hover { background-color:#d51408; }
+.top-user-panel .l-check{ text-align:left; margin:12px 0px 0px 42px;}
+.top-user-panel .l-check,.top-user-panel .l-check a{ color:#444; font-size:12px;}
+
+.l-banner{position:relative; z-index:20;}
+.l-banners{height:500px; }
+.index_bg001 {background: url(../img/000.png) no-repeat center bottom;height:500px;background-color: #132744;}
+.index_bg001 {background: url(../img/001.png) no-repeat center bottom;height:500px;background-color: #132744;}
+.index_bg002 {background: url(../img/002.png) no-repeat center bottom;height:500px;background-color: #132744;}
+.index_bg003 {background: url(../img/003.png) no-repeat center bottom;height:500px;background-color: #132744;}
+.index_bg004 {background: url(../img/004.png) no-repeat center bottom;height:500px;background-color: #132744;}
+.index_bg005 {background: url(../img/005.png) no-repeat center bottom;height:500px;background-color: #132744;}
+.index_bg006 {background: url(../img/006.png) no-repeat center bottom;height:500px;background-color: #132744;}
+.index_bg_01 {background: url(../img/01.jpg) no-repeat center bottom;height:500px;background-color: #132744;}
+.index_bg_02 {background: url(../img/02.jpg) no-repeat center bottom;height:500px;background-color: #132744;}
+.index_bg_03 {background: url(../img/03.jpg) no-repeat center bottom;height:500px;background-color: #132744;}
+
+#warp {width: 100%; height: 500px; padding:0px; margin:0px; _margin-top:30px;}
+.banner {  margin: 0px auto; width: 1280px; height: 500px; _width: 1280px; position:relative;}
+.bannerimg {position: relative;width: 1280px;}
+.slides_container {	position: relative; width:1280px; overflow: hidden;}
+.bannerimg {	position: relative; padding-bottom: 0px; margin: 0px; padding-left: 0px; width: 1280px; padding-right: 0px; float: left; padding-top: 0px}
+.bannerimg .bannerpage {	position: absolute; top: 300px; left: 420px}
+.bannerimg .bannerpage a {	margin-right: 2px}
+.bannerimg .bannerpage a img {	vertical-align: middle}
+.slides_container {	position: relative; width: 1280px; overflow: hidden}
+.pagination {position:absolute; top:410px; left:530px;}
+.pagination li {margin: 0px 1px; float: left;}
+.pagination li a {background-image: url(//img.233.com/wx/img/unionadmin/login/pagination.png); width: 15px; display: block; background-position: 0px -1px; float: left; height: 0px; overflow: hidden; padding-top: 12px;}
+.pagination li.current a {	background-position: 0px -18px;}
+
