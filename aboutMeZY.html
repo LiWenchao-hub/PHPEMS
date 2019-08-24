@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>明德云课堂</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Bootstrap v3.3.5        样式表-->
+    <link rel="stylesheet" type="text/css" href="app/core/styles/css/bootstrap.css" />
+    <!--link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous"-->
+    <link rel="stylesheet" type="text/css" href="app/core/styles/css/datetimepicker.css" />
+    <link rel="stylesheet" type="text/css" href="app/core/styles/css/jquery-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="app/core/styles/css/peskin.css" />
+    <link rel="stylesheet" type="text/css" href="app/core/styles/css/page.css">
+    <!--[if lt IE 9]>
+    <script src="app/core/styles/js/html5shiv.min.js"></script>
+    <script src="app/core/styles/js/respond.min.js"></script>
+    <![endif]-->
+    <script src="app/core/styles/js/jquery.min.js"></script>
+    <script src="app/core/styles/js/jquery-ui.min.js"></script>
+    <!-- Bootstrap v3.3.5    JavaScript库-->
+    <script src="app/core/styles/js/bootstrap.min.js"></script>
+    <!--script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script-->
+    <script src="app/core/styles/js/bootstrap-datetimepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="app/core/styles/font-awesome-4.7.0/css/font-awesome.min.css">
+
+    <!--   Bootstrap v4.1    开始 -->
+    <!--   script scr="app/core/styles/js/bootstrap/css/bootstrap.css"></script -->
+    <!--   script scr="app/core/styles/js/bootstrap/css/bootstrap-theme.css"></script -->
+    <!--   Bootstrap v4.1    结束 -->
+
+    <script src="app/core/styles/js/all.fine-uploader.min.js"></script>
+    <script src="app/core/styles/js/ckeditor/js/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script src="app/core/styles/js/ckeditor/ckeditor.js"></script>
+    <script src="app/core/styles/js/plugin.js"></script>
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function fixHeight() {
+                var headerHeight = $("#switcher").height();
+                $("#iframe").attr("height", $(window).height()-54+ "px");
+            }
+            $(window).resize(function () {
+                fixHeight();
+            }).resize();
+
+            $('.icon-monitor').addClass('active');
+
+            $(".icon-mobile-3").click(function () {
+                $("#by").css("overflow-y", "auto");
+                $('#iframe-wrap').removeClass().addClass('mobile-width-3');
+                $('.icon-tablet,.icon-mobile-1,.icon-monitor,.icon-mobile-2,.icon-mobile-3').removeClass('active');
+                $(this).addClass('active');
+                return false;
+            });
+
+            $(".icon-mobile-2").click(function () {
+                $("#by").css("overflow-y", "auto");
+                $('#iframe-wrap').removeClass().addClass('mobile-width-2');
+                $('.icon-tablet,.icon-mobile-1,.icon-monitor,.icon-mobile-2,.icon-mobile-3').removeClass('active');
+                $(this).addClass('active');
+                return false;
+            });
+
+            $(".icon-mobile-1").click(function () {
+                $("#by").css("overflow-y", "auto");
+                $('#iframe-wrap').removeClass().addClass('mobile-width');
+                $('.icon-tablet,.icon-mobile,.icon-monitor,.icon-mobile-2,.icon-mobile-3').removeClass('active');
+                $(this).addClass('active');
+                return false;
+            });
+
+            $(".icon-tablet").click(function () {
+                $("#by").css("overflow-y", "auto");
+                $('#iframe-wrap').removeClass().addClass('tablet-width');
+                $('.icon-tablet,.icon-mobile-1,.icon-monitor,.icon-mobile-2,.icon-mobile-3').removeClass('active');
+                $(this).addClass('active');
+                return false;
+            });
+
+            $(".icon-monitor").click(function () {
+                $("#by").css("overflow-y", "hidden");
+                $('#iframe-wrap').removeClass().addClass('full-width');
+                $('.icon-tablet,.icon-mobile-1,.icon-monitor,.icon-mobile-2,.icon-mobile-3').removeClass('active');
+                $(this).addClass('active');
+                return false;
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        function Responsive($a) {
+            if ($a == true) $("#Device").css("opacity", "100");
+            if ($a == false) $("#Device").css("opacity", "0");
+            $('#iframe-wrap').removeClass().addClass('full-width');
+            $('.icon-tablet,.icon-mobile-1,.icon-monitor,.icon-mobile-2,.icon-mobile-3').removeClass('active');
+            $(this).addClass('active');
+            return false;
+        };
+    </script>
+
+</head>
+
+<body>
+<div class="container-fluid box" style="margin:0px auto;padding-top:10px;overflow:visible">
+    <div class="row-fluid">
+        <div class="main">
+            <div class="col-xs-3">
+                <h1 style="font-size:6px;color:#337AB7;"><img src="app/core/styles/img/logo2.png" style="height:60px;margin-top:-10px;"/>&nbsp;</h1>
+            </div>
+            <div class="col-xs-1">
+            </div>
+            <div class="col-xs-6" style="padding-top:22px;">
+                <div class="form-inline">
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                内容检索 <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="index.php?exam-app">— 取 证 考 试 —</a></li>
+                                <li><a href="index.php?course-app">— 提 升 课 程 —</a></li>
+                                <li><a href="index.php?docs-app">— 辅 助 资 料 —</a></li>
+                                <li><a href="index.php?content-app">— 站 内 新 闻 —</a></li>
+                            </ul>
+                        </div>
+                        <input type="text" style="width:380px;" class="form-control" id="keyword" placeholder="输入搜索关键词">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="javascript:window.location='index.php?content-app-search&keyword='+$('#keyword').val();"> 搜 索 </button>
+                </div>
+            </div>
+            <div class="col-xs-2" style="padding-top:22px;">
+                <ul class="list-unstyled list-inline">
+                    <li><a href="javascript:;" onclick="javascript:$.loginbox.show();" class="btn btn-default"> 登 录 </a></li>
+                    <li><a href="index.php?user-app-register" class="btn btn-default"> 注 册 </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid navbar" style="margin-top:0px;margin-bottom:0px;padding-top:10px;background-color:#337AB7;">
+    <div class="row-fluid">
+        <div class="main">
+            <div class="col-xs-12">
+                <ul class="list-unstyled list-inline" >
+                    <li class="menu col-xs-1 active">
+                        <a href="index.php" class="icon" >
+                            <!--span class="fa fa-home" style="font-size: 24pt"></span-->
+                            首页
+                        </a>
+                    </li>
+
+                    <li class="menu col-xs-1">
+                        <a href="index.php?course-app-index-lists">
+                            <!--span class="fa fa-language" style="font-size: 24pt"></span-->
+                            学历教育
+                        </a>
+                    </li>
+                    <li class="menu col-xs-1">
+                        <a href="#">
+                            <!--span class="fa fa-universal-access"style="font-size: 24pt"></span-->
+                            职业培训
+                        </a>
+                    </li>
+                    <li class="menu col-xs-1">
+                        <a href="index.php?exam-app-basics-open">
+                            <!--span class="fa fa-cubes" aria-hidden="true"style="font-size: 24pt"></span-->
+                            考试助手
+                        </a>
+                    </li>
+                    <!--li class="menu col-xs-1"><a href="index.php?exam">模拟考场</a></li>
+                    <li class="menu col-xs-1"><a href="index.php?docs">文档</a></li -->
+                    <li class="menu col-xs-1">
+                        <a href="index.php?course-app-index-all">
+                            <!--span class="fa fa-newspaper-o" aria-hidden="true"style="font-size: 24pt"></span-->
+                            课程中心
+                        </a>
+                    </li>
+                    <li class="menu col-xs-1">
+                        <a href="#">
+                            <!--span class="fa fa-newspaper-o" aria-hidden="true"style="font-size: 24pt"></span-->
+                            关于我们
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="col-xs-10 box split" style="padding:0px;width:100%;background-color: ">
+            <div id="carousel-example-generic" >
+                <div >
+                    <div align="center" id="p1">
+                        <a href="#p2">
+                            <img src="app/core/styles/img/web-002-2.png" alt="" style="width:1280px;">
+                        </a>
+                    </div>
+                    <div align="center" id="p2">
+                        <a href="#p3">
+                            <img src="app/core/styles/img/web-002-3.png" alt="" style="width:1280px;">
+                        </a>
+                    </div>
+                    <div align="center" id="p3">
+                        <a href="#p4">
+                            <img src="app/core/styles/img/web-002-4.png" alt="" style="width:1280px;">
+                        </a>
+                    </div>
+                    <div align="center" id="p4">
+                        <a href="#p1">
+                            <img src="app/core/styles/img/web-002-5.png" alt="" style="width:1280px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid box" style="background-color:#337AB7;margin-bottom:0px;" id="footer">
+    <div class="row-fluid">
+        <div class="main itembox">
+            <div class="col-xs-12">
+                <ul class="list-unstyled">
+                    <li class="text-center"><a href="#">明德云课堂</a>  || 咨询电话：<font color=red>0991-8776732</font></li>
+                    <li class="text-center"><a href="http://map.baidu.com/?newmap=1&ie=utf-8&s=s%26wd%3D%E6%96%B0%E7%96%86%E5%86%9C%E4%B8%9A%E5%A4%A7%E5%AD%A6%E6%88%90%E4%BA%BA%E6%95%99%E8%82%B2%E5%AD%A6%E9%99%A2" target="_blank">地址：新疆乌鲁木齐市沙依巴克区农大东路311号</li>
+                    <li class="text-center"><a href="#">Copyright ©  2018新疆明德励学教育投资有限公司</a>   All Rights Reserved   </li>
+                    <li class="text-center">
+                        <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=65010402001055" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;"><img src="http://pic5.ablesky.cn/content/pic/album/2018/01/24/203a82ba-39a6-4e25-9294-3945e8d21579.png" style="float:left;"/><p style="float:left;height:20px;line-height:20px;margin: 0px 0px 0px 5px; color:#939393;">新公网安备 65010402001055号 ||  新ICP备17001295号-3</p></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
