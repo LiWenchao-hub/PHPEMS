@@ -18,14 +18,33 @@
 					</div>
 				</div>
 				<div class="box itembox" style="padding-top:10px;">
-					<div class="col-xs-12" style="padding-left:0px;">
+					<div  style="padding-left:0px;width: 100%;">
 						{x2;tree:$contents['data'],content,cid}
-						<div class="col-xs-3" style="width:20%">
+
+						{x2;if:v:content['num']%4!=0}
+						<div>
+						<div style="width:20%;float: left;margin-left: 30px;">
 							<a href="index.php?course-app-course&csid={x2;v:content['csid']}" class="thumbnail">
-								<img src="{x2;if:v:content['csthumb']}{x2;v:content['csthumb']}{x2;else}app/core/styles/img/item.jpg{x2;endif}" alt="" width="100%">
+								<!--<img  src="app/core/styles/img/item.jpg" />-->
+								<img  src="{x2;if:v:content['csthumb']}{x2;v:content['csthumb']}{x2;else}app/core/styles/img/item.jpg{x2;endif}" />
 							</a>
 							<h5 class="text-center">{x2;v:content['cstitle']}</h5>
 						</div>
+
+						{x2;else}
+
+						<div style="width:20%;float:left;margin-left: 30px;">
+							<a href="index.php?course-app-course&csid={x2;v:content['csid']}" class="thumbnail">
+								<!--<img  src="app/core/styles/img/item.jpg" />-->
+								<img  src="{x2;if:v:content['csthumb']}{x2;v:content['csthumb']}{x2;else}app/core/styles/img/item.jpg{x2;endif}" >
+							</a>
+							<h5 class="text-center">{x2;v:content['cstitle']}</h5>
+						</div>
+
+						</div>
+
+						{x2;endif}
+
 						{x2;endtree}
 						<ul class="pagination pagination-right">{x2;$contents['pages']}</ul>
 					</div>
@@ -37,4 +56,13 @@
 </div>
 {x2;include:footer}
 </body>
+
+<script type="text/javascript">
+
+	/*页面加载完毕后执行*/
+	$(function() {
+
+	});
+
+</script>
 </html>

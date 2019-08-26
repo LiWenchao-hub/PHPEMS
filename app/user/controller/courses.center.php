@@ -25,6 +25,11 @@ class action extends app
         //die("9999");
         $page = $this->ev->get('page');
         $contents = $this->course->getOpenCourseListByUserid($this->_user['sessionuserid'],$page);
+        $i=1;
+        foreach ($contents["data"] as &$item){
+            $item["num"]=$i;
+            $i++;
+        }
         $this->tpl->assign('contents',$contents);
         $this->tpl->assign('page',$page);
         $this->tpl->display('courses');
