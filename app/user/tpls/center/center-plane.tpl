@@ -11,14 +11,13 @@
 				<div class="box itembox" style="margin-bottom:0px;border-bottom:1px solid #CCCCCC;">
 					<div class="col-xs-12">
 						<ol class="breadcrumb">
-							<li><a href="index.php?user-center">首页</a></li>
 							<li><a href="index.php?{x2;$_app}-center">学生中心</a></li>
 							<li class="active">教学计划</li>
 						</ol>
 					</div>
 				</div>
 				<div class="box itembox" style="padding-top:10px;">
-					<h4 class="title"> {x2;$user['userreferrer']}-{x2;$user['normal_studyLevel']}</h4>
+					<h4> {x2;$user['userreferrer']}-{x2;$user['normal_studyLevel']}</h4>
 					<table class="table table-hover table-bordered">
 						<thead>
 						<tr class="info">

@@ -11,14 +11,12 @@
 				<div class="box itembox" style="margin-bottom:0px;border-bottom:1px solid #CCCCCC;">
 					<div class="col-xs-12">
 						<ol class="breadcrumb">
-							<li><a href="index.php">首页</a></li>
 							<li><a href="index.php?{x2;$_app}-center">学生中心</a></li>
 							<li class="active">系统消息</li>
 						</ol>
 					</div>
 				</div>
 				<div class="box itembox" style="padding-top:10px;">
-					<h4 class="title" style="padding:10px;">系统消息</h4>
 					<table class="table table-hover table-bordered" style="margin-top:10px;">
 						<thead>
 						<tr class="info">

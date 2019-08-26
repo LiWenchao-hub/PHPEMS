@@ -11,7 +11,6 @@
 				<div class="box itembox" style="margin-bottom:0px;border-bottom:1px solid #CCCCCC;">
 					<div class="col-xs-12">
 						<ol class="breadcrumb">
-							<li><a href="index.php?user-center">首页</a></li>
 							<li><a href="index.php?{x2;$_app}-center">学生中心</a></li>
 							<li class="active">成绩查询 </li>
 						</ol>

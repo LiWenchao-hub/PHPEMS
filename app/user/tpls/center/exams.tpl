@@ -11,14 +11,13 @@
 				<div class="box itembox" style="margin-bottom:0px;border-bottom:1px solid #CCCCCC;">
 					<div class="col-xs-12">
 						<ol class="breadcrumb">
-							<li><a href="index.php?user-center">首页</a></li>
 							<li><a href="index.php?{x2;$_app}-center">学生中心</a></li>
-							<li class="active">考试训练</li>
+							<li class="active">我的考场</li>
 						</ol>
 					</div>
 				</div>
 				<div class="box itembox" style="padding-top:10px;">
-					<h4 class="title" style="padding:10px;">我的考试训练<!--a href="index.php?exam-app-basics-open" class="btn btn-primary pull-right"><em class="glyphicon glyphicon-plus-sign"></em> 开通新考场</a--></h4>
+					<!--a href="index.php?exam-app-basics-open" class="btn btn-primary pull-right"><em class="glyphicon glyphicon-plus-sign"></em> 开通新考场</a--></h4>
 					<div class="col-xs-12" style="padding-left:0px;">
 						{x2;tree:$basics,basic,bid}
 						

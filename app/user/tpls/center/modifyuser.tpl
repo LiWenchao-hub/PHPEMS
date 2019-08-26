@@ -11,14 +11,12 @@
 				<div class="box itembox" style="margin-bottom:0px;border-bottom:1px solid #CCCCCC;">
 					<div class="col-xs-12">
 						<ol class="breadcrumb">
-							<li><a href="index.php">首页</a></li>
-							<li><a href="index.php?user-center-privatement">个人中心</a></li>
-							<li class="active">隐私管理</li>
+							<li><a href="index.php?user-center-privatement">学生中心</a></li>
+							<li class="active">个人设置</li>
 						</ol>
 					</div>
 				</div>
 				<div class="box itembox" style="padding-top:10px;">
-					<h4 class="title">隐私管理</h4>
 					<div id="tabs-694325" class="tabbable">
 						<ul class="nav nav-tabs">
 							<li class="active">
