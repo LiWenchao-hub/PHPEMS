@@ -18,58 +18,53 @@ class action extends app
     {
         $this->cuser = $this->user->getUserById($this->_user['sessionuserid']);
         $this->module = $this->G->make('module');
-        $this->progress = $this->G->make('progress','user');
-        $this->basic = $this->G->make('basic','exam');
-        $this->favor = $this->G->make('favor','exam');
-        $this->course = $this->G->make('course','course');
-        $this->edu = $this->G->make('edu','edu');
+        $this->progress = $this->G->make('progress', 'user');
+        $this->basic = $this->G->make('basic', 'exam');
+        $this->favor = $this->G->make('favor', 'exam');
+        $this->course = $this->G->make('course', 'course');
+        $this->edu = $this->G->make('edu', 'edu');
         $majors = $this->edu->getAllMajor();
-        $this->tpl->assign('majors',$majors);
+        $this->tpl->assign('majors', $majors);
         $grade = array();
-        $t = date('Y')+1;
-        for($i = 0;$i < 5;$i++)
-        {
+        $t = date('Y') + 1;
+        for ($i = 0; $i < 5; $i++) {
             $grade[] = $t - $i;
         }
-        $this->tpl->assign('grade',$grade);
+        $this->tpl->assign('grade', $grade);
         $action = $this->ev->url(3);
         $search = $this->ev->get('search');
         $this->u = '';
-        if($search)
-        {
-            $this->tpl->assign('search',$search);
-            foreach($search as $key => $arg)
-            {
+        if ($search) {
+            $this->tpl->assign('search', $search);
+            foreach ($search as $key => $arg) {
                 $this->u .= "&search[{$key}]={$arg}";
             }
         }
-        $this->tpl->assign('u',$this->u);
-        if(!method_exists($this,$action))
-        {
+        $this->tpl->assign('u', $this->u);
+        if (!method_exists($this, $action)) {
             $action = "index";
         }
         $this->$action();
         exit;
     }
 
+
     private function batopen()
     {
         $page = $this->ev->get('page');
-        $page = $page > 1?$page:1;
+        $page = $page > 1 ? $page : 1;
         $userid = $this->ev->get('userid');
         $pdid = $this->ev->get('pdid');
         $detail = $this->edu->getPlanDetailById($pdid);
         $course = array();
         $basic = array();
-        foreach($detail['pdcourse'] as $p)
-        {
-            if(!$course[$p])
-            {
+        foreach ($detail['pdcourse'] as $p) {
+            if (!$course[$p]) {
                 $course[$p] = $this->course->getCourseById($p);
             }
-            $args = array('ocuserid' => $userid,'occourseid'=>$p,'ocendtime' => TIME + 365*24*3600);
+            $args = array('ocuserid' => $userid, 'occourseid' => $p, 'ocendtime' => TIME + 365 * 24 * 3600);
             $this->course->openCourse($args);
-            $this->basic->openBasic(array('obuserid' => $userid,'obbasicid'=>$course[$p]['csbasicid'],'obendtime' => TIME + 365*24*3600));
+            $this->basic->openBasic(array('obuserid' => $userid, 'obbasicid' => $course[$p]['csbasicid'], 'obendtime' => TIME + 365 * 24 * 3600));
         }
         $message = array(
             'statusCode' => 200,
@@ -83,95 +78,161 @@ class action extends app
     private function open()
     {
         $userid = $this->ev->get('userid');
-        $page = $this->ev->get('page')?$this->ev->get('page'):1;
+        $page = $this->ev->get('page') ? $this->ev->get('page') : 1;
         $user = $this->user->getUserById($userid);
         $args = array();
-        $args[] = array("AND","planyear = :planyear","planyear",$user['normal_favor']);
-        $args[] = array("AND","major = :major","major",$user['userreferrer']);
+        $args[] = array("AND", "planyear = :planyear", "planyear", $user['normal_favor']);
+        $args[] = array("AND", "major = :major", "major", $user['userreferrer']);
         $plan = $this->edu->getPlanByArgs($args);
-        if($plan)
-        {
+        if ($plan) {
             $args = array();
-            $args[] = array("AND","pdplanid = :pdplanid","pdplanid",$plan['planid']);
-            $details = $this->edu->getPlanDetailList($args,$page);
+            $args[] = array("AND", "pdplanid = :pdplanid", "pdplanid", $plan['planid']);
+            $details = $this->edu->getPlanDetailList($args, $page);
             $courses = $this->course->getAllCourses();
-            $this->tpl->assign('courses',$courses);
+            $this->tpl->assign('courses', $courses);
         }
-        $this->tpl->assign('user',$user);
-        $this->tpl->assign('plan',$plan);
-        $this->tpl->assign('details',$details);
+        $this->tpl->assign('user', $user);
+        $this->tpl->assign('plan', $plan);
+        $this->tpl->assign('details', $details);
         $this->tpl->display('student_open');
     }
 
     private function document()
     {
-        $page = $this->ev->get('page')?$this->ev->get('page'):1;
-        $search = $this->ev->get('search');
-        $u = '';
-        if($search)
-        {
-            foreach($search as $key => $arg)
-            {
-                $u .= "&search[{$key}]={$arg}";
-            }
-        }
-        $args = array();
-        $args[] = array('AND',"usergroupid IN (8,10)");
-        $args[] = array('AND',"usersequence =  :usersequence","usersequence",$this->cuser['usersequence']);
-        if($search['userid'])$args[] = array('AND',"userid = :userid",'userid',$search['userid']);
-        if($search['usertruename'])$args[] = array('AND',"usertruename LIKE :usertruename",'usertruename','%'.$search['usertruename'].'%');
-        if($search['useremail'])$args[] = array('AND',"useremail  LIKE :useremail",'useremail','%'.$search['useremail'].'%');
-
-        if($search['normal_schID'])$args[] = array('AND',"normal_schID = :normal_schID",'normal_schID',$search['normal_schID']);
-        if($search['username'])$args[] = array('AND',"username LIKE :username",'username','%'.$search['username'].'%');
-        
-        if($search['stime'] || $search['etime'])
-        {
-            if(!is_array($args))$args = array();
-            if($search['stime']){
-                $stime = strtotime($search['stime']);
-                $args[] = array('AND',"userregtime >= :userregtime",'userregtime',$stime);
-            }
-            if($search['etime']){
-                $etime = strtotime($search['etime']);
-                $args[] = array('AND',"userregtime <= :userregtime",'userregtime',$etime);
-            }
-        }
-        if($search['mobile'])$args[] = array('AND',"mobile = :mobile",'mobile',$search['mobile']);
-        if($search['normal_favor'])$args[] = array('AND',"normal_favor = :normal_favor",'normal_favor',$search['normal_favor']);
-        if($search['userreferrer'])$args[] = array('AND',"userreferrer = :userreferrer",'userreferrer',$search['userreferrer']);
-        if($search['normal_rest'])
-        {
-            if($search['normal_rest'] == 1)
-                $args[] = array('AND',"normal_rest = 1");
-            else
-                $args[] = array('AND',"normal_rest = 0");
-        }
-        if($search['normal_finish'])
-        {
-            if($search['normal_finish'] == 1)
-                $args[] = array('AND',"normal_finish = 1");
-            else
-                $args[] = array('AND',"normal_finish = 0");
-        }
-        if($search['userischeck'])
-        {
-            if($search['userischeck'] == 1)
-                $args[] = array('AND',"userischeck = 1");
-            else
-                $args[] = array('AND',"userischeck = 0");
-        }
-        /*
-        echo("<pre>");
-        var_dump($args);
-        echo("</pre>");
-        */
-        $users = $this->user->getUserList($page,100,$args);
-        $this->tpl->assign('users',$users);
-        $this->tpl->assign('search',$search);
-        $this->tpl->assign('u',$u);
-        $this->tpl->assign('page',$page);
         $this->tpl->display('student_document');
+    }
+
+    /*查询*/
+    private function documentQuery()
+    {
+        $type = $this->ev->get('type');
+        $page = $this->ev->get('page') ? $this->ev->get('page') : 1;
+        $search = $this->ev->get('search');
+        $args = array();
+        $args[] = array('AND', "usergroupid IN (8,10)");
+        $args[] = array('AND', "usersequence =  :usersequence", "usersequence", $this->cuser['usersequence']);
+        //用户姓名
+        if ($search["0"]['value']) {
+            $args[] = array('AND', "usertruename LIKE :usertruename", 'usertruename', '%' . $search["0"]['value'] . '%');
+        };
+        //身份证
+        if ($search["1"]['value']) {
+            $args[] = array('AND', "username LIKE :username", 'username', '%' . $search["1"]['value'] . '%');
+        };
+        //学号
+        if ($search["2"]['value']) {
+            $args[] = array('AND', "normal_schID = :normal_schID", 'normal_schID', $search["2"]['value']);
+        };
+
+        //年级
+        if ($search["3"]['value']) {
+            $args[] = array('AND', "normal_favor = :normal_favor", 'normal_favor', $search["3"]['value']);
+        }
+        //专业
+        if ($search["4"]['value']) {
+            $args[] = array('AND', "userreferrer = :userreferrer", 'userreferrer', $search["4"]['value']);
+        }
+        //学习形式
+        if ($search["5"]['value']) {
+            $args[] = array('AND', "normal_studyType = :normal_studyType", 'normal_studyType', $search["5"]['value']);
+        }
+        //学习层次
+        if ($search["6"]['value']) {
+            $args[] = array('AND', "normal_studyLevel = :normal_studyLevel", 'normal_studyLevel', $search["6"]['value']);
+        }
+        $users = $this->user->getUserList($page, 100, $args);
+
+        foreach ($users["data"] as &$val) {
+            $normal_schID = $val["normal_schID"];
+            $normal_schID_length = strlen($normal_schID);
+            $normal_schID_array = str_split($normal_schID);
+            $normal_studyLevel_num = "";//学号第七位表示学历层次
+            $normal_studyType_num = "";//学号第八位表示学习形式
+            if ($normal_schID_length >= 8) {
+                for ($i = 0; $i < $normal_schID_length; $i++) {
+                    $normal_studyLevel_num = $normal_schID_array["6"];//数组下标从0开始，第六位实际为第七位
+                    $normal_studyType_num = $normal_schID_array["7"];//数组下标从0开始，第七位实际为第八位
+                }
+                if ($normal_studyLevel_num == "0") {
+                    $val["normal_studyLevel"] = "本科";
+                } else {
+                    $val["normal_studyLevel"] = "专科";
+                }
+
+                if ($normal_studyType_num == "1") {
+                    $val["normal_studyType"] = "业余";
+                } else {
+                    $val["normal_studyType"] = "函授";
+                }
+            }
+        }
+        if ($type == "1") {//导出
+            $objPHPExcel = new PHPExcel();//定义objPHPExcel对象
+            $objPHPExcel->setActiveSheetIndex(0);//指定活动的sheet为0，也就是第一个
+            $objSheet = $objPHPExcel->getActiveSheet();//获取活动的sheet
+            $objSheet->setTitle("档案查询");
+            $objSheet->getRowDimension('1')->setRowHeight(20);//设置第一行高度
+            $objSheet->getColumnDimension('A')->setWidth(25);//设置列宽度
+            $objSheet->getColumnDimension('B')->setWidth(20);//设置列宽度
+            $objSheet->getColumnDimension('C')->setWidth(20);//设置列宽度
+            $objSheet->getColumnDimension('D')->setWidth(15);//设置列宽度
+            $objSheet->getColumnDimension('E')->setWidth(15);//设置列宽度
+            $objSheet->getColumnDimension('F')->setWidth(15);//设置列宽度
+            $objSheet->getStyle("A1:F1")->getFont()->setName("宋体")->setSize(16)->setBold(true);
+            $objSheet->getStyle("A1:F1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);//居中
+//                    $objSheet->getStyle('B')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);//设置文字居左
+            $objSheet->getStyle("A2:F2")->getFont()->setName("宋体")->setSize(14)->setBold(true);
+
+            $grade = $users["data"]["0"]["normal_favor"];//年级
+            $major = $users["data"]["0"]["userreferrer"];//专业
+            $objSheet->setCellValue('A1', $grade . "-" . $major);
+            $objSheet->mergeCells("A1:F1");//合并单元格
+
+            $objSheet->setCellValue("A2", "姓名")->setCellValue("B2", "学号")->
+            setCellValue("C2", "身份证号码")->setCellValue("D2", "学习层次")->setCellValue("E2", "学习形式")
+                ->setCellValue("F2", "电话");
+            $i = 3;
+            foreach ($users["data"] as $key => $val) {
+                $objSheet->setCellValue("A" . $i, $val["usertruename"])->setCellValue("B" . $i, $val["normal_schID"])->setCellValue("C" . $i, $val["username"])->
+                setCellValue("D" . $i, $val["normal_studyLevel"])->setCellValue("E" . $i, $val["normal_studyType"])->setCellValue("F" . $i, $val["mobile"]);
+                $i++;
+            }
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, "Excel5");
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename=' . iconv("utf-8", "GBK", $grade . "-" . $major) . '-档案信息.xls');
+            header('Cache-Control: max-age=0');
+            //返回已经存好的文件目录地址提供下载
+            $objWriter = new PHPExcel_Writer_Excel5($objPHPExcel);
+            $response = array(
+                'success' => true,
+                'url' => $this->saveExcelToLocalFile($objWriter, $grade . "-" . $major . "-档案信息.xls")
+            );
+            if ($response) {
+                echo $this->jsons_encode($response);
+                exit;
+            }
+        }
+        echo json_encode($users["data"]);
+        exit;
+    }
+
+    // 生成xlsx文件并存入当前文件目录
+    function saveExcelToLocalFile($objWriter, $filename)
+    {
+        $filePath = dirname(__FILE__) . '/../../../files/tmp/' . iconv("utf-8", "gb2312", $filename);
+        $downpath = '/../../../files/tmp/' . $filename;
+        $objWriter->save($filePath);
+        return $downpath;
+    }
+
+    function jsons_encode($array)
+    {
+        //遍历已有数组，将每个值 urlencode 一下
+        foreach ($array as $key => $value) {
+            $array[$key] = urlencode($value);
+        }
+        //用urldecode将值反解
+        return urldecode(json_encode($array));
     }
 
     private function showscore()
@@ -180,15 +241,13 @@ class action extends app
         $user = $this->user->getUserById($userid);
         $this->module = $this->G->make('module');
         $appid = 'user';
-        $app = $this->G->make('apps','core')->getApp($appid);
-        $this->tpl->assign('app',$app);
+        $app = $this->G->make('apps', 'core')->getApp($appid);
+        $this->tpl->assign('app', $app);
         $fields = array();
-        $tpfields = explode(',',$app['appsetting']['outfields']);
-        foreach($tpfields as $f)
-        {
+        $tpfields = explode(',', $app['appsetting']['outfields']);
+        foreach ($tpfields as $f) {
             $tf = $this->module->getFieldByNameAndModuleid($f);
-            if($tf && $tf['fieldappid'] == 'user')
-            {
+            if ($tf && $tf['fieldappid'] == 'user') {
                 $fields[$tf['fieldid']] = $tf;
             }
         }
@@ -196,36 +255,32 @@ class action extends app
         $search = $this->ev->get('search');
         $basicid = intval($this->ev->get('basicid'));
         $basic = $this->basic->getBasicById($basicid);
-        $page = $page > 0?$page:1;
+        $page = $page > 0 ? $page : 1;
         $args = array();
-        $args[] = array('AND',"ehtype = '2'");
-        $args[] = array('AND',"ehstatus = '1'");
-        $args[] = array('AND',"ehuserid = :ehuserid",'ehuserid',$userid);
-        if($search['stime'])
-        {
+        $args[] = array('AND', "ehtype = '2'");
+        $args[] = array('AND', "ehstatus = '1'");
+        $args[] = array('AND', "ehuserid = :ehuserid", 'ehuserid', $userid);
+        if ($search['stime']) {
             $stime = strtotime($search['stime']);
-            $args[] = array('AND',"ehstarttime >= :stime",'stime',$stime);
+            $args[] = array('AND', "ehstarttime >= :stime", 'stime', $stime);
         }
-        if($search['etime'])
-        {
+        if ($search['etime']) {
             $etime = strtotime($search['etime']);
-            $args[] = array('AND',"ehstarttime <= :etime",'etime',$etime);
+            $args[] = array('AND', "ehstarttime <= :etime", 'etime', $etime);
         }
-        if($search['sscore'])
-        {
-            $args[] = array('AND',"ehscore >= :sscore",'sscore',$search['sscore']);
+        if ($search['sscore']) {
+            $args[] = array('AND', "ehscore >= :sscore", 'sscore', $search['sscore']);
         }
-        if($search['escore'])
-        {
-            $args[] = array('AND',"ehscore <= :escore",'escore',$search['escore']);
+        if ($search['escore']) {
+            $args[] = array('AND', "ehscore <= :escore", 'escore', $search['escore']);
         }
-        $exams = $this->favor->getExamHistoryListByArgs($page,30,$args);
-        $this->tpl->assign('user',$user);
-        $this->tpl->assign('search',$search);
-        $this->tpl->assign('basic',$basic);
-        $this->tpl->assign('page',$page);
-        $this->tpl->assign('fields',$fields);
-        $this->tpl->assign('exams',$exams);
+        $exams = $this->favor->getExamHistoryListByArgs($page, 30, $args);
+        $this->tpl->assign('user', $user);
+        $this->tpl->assign('search', $search);
+        $this->tpl->assign('basic', $basic);
+        $this->tpl->assign('page', $page);
+        $this->tpl->assign('fields', $fields);
+        $this->tpl->assign('exams', $exams);
         $this->tpl->display('student_showscore');
     }
 
@@ -233,190 +288,171 @@ class action extends app
     {
         $this->module = $this->G->make('module');
         $appid = 'user';
-        $app = $this->G->make('apps','core')->getApp($appid);
-        $this->tpl->assign('app',$app);
+        $app = $this->G->make('apps', 'core')->getApp($appid);
+        $this->tpl->assign('app', $app);
         $fields = array();
-        $tpfields = explode(',',$app['appsetting']['outfields']);
-        foreach($tpfields as $f)
-        {
+        $tpfields = explode(',', $app['appsetting']['outfields']);
+        foreach ($tpfields as $f) {
             $tf = $this->module->getFieldByNameAndModuleid($f);
-            if($tf && $tf['fieldappid'] == 'user')
-            {
+            if ($tf && $tf['fieldappid'] == 'user') {
                 $fields[$tf['fieldid']] = $tf;
             }
         }
-        $page = $this->ev->get('page')?$this->ev->get('page'):1;
+        $page = $this->ev->get('page') ? $this->ev->get('page') : 1;
         $search = $this->ev->get('search');
         $u = '';
-        if($search)
-        {
-            foreach($search as $key => $arg)
-            {
+        if ($search) {
+            foreach ($search as $key => $arg) {
                 $u .= "&search[{$key}]={$arg}";
             }
         }
         $args = array();
-        $args[] = array('AND',"usergroupid IN (8,10)");
-        $args[] = array('AND',"usersequence =  :usersequence","usersequence",$this->cuser['usersequence']);
-        if($search['userid'])$args[] = array('AND',"userid = :userid",'userid',$search['userid']);
-        if($search['usertruename'])$args[] = array('AND',"usertruename  LIKE :usertruename",'usertruename','%'.$search['usertruename'].'%');
+        $args[] = array('AND', "usergroupid IN (8,10)");
+        $args[] = array('AND', "usersequence =  :usersequence", "usersequence", $this->cuser['usersequence']);
+        if ($search['userid']) $args[] = array('AND', "userid = :userid", 'userid', $search['userid']);
+        if ($search['usertruename']) $args[] = array('AND', "usertruename  LIKE :usertruename", 'usertruename', '%' . $search['usertruename'] . '%');
 
 
-        if($search['normal_schID'])$args[] = array('AND',"normal_schID  LIKE  :normal_schID",'normal_schID','%'.$search['normal_schID'].'%');
-        if($search['username'])$args[] = array('AND',"username LIKE :username",'username','%'.$search['username'].'%');
-        if($search['useremail'])$args[] = array('AND',"useremail  LIKE :useremail",'useremail','%'.$search['useremail'].'%');
-        if($search['stime'] || $search['etime'])
-        {
-            if(!is_array($args))$args = array();
-            if($search['stime']){
+        if ($search['normal_schID']) $args[] = array('AND', "normal_schID  LIKE  :normal_schID", 'normal_schID', '%' . $search['normal_schID'] . '%');
+        if ($search['username']) $args[] = array('AND', "username LIKE :username", 'username', '%' . $search['username'] . '%');
+        if ($search['useremail']) $args[] = array('AND', "useremail  LIKE :useremail", 'useremail', '%' . $search['useremail'] . '%');
+        if ($search['stime'] || $search['etime']) {
+            if (!is_array($args)) $args = array();
+            if ($search['stime']) {
                 $stime = strtotime($search['stime']);
-                $args[] = array('AND',"userregtime >= :userregtime",'userregtime',$stime);
+                $args[] = array('AND', "userregtime >= :userregtime", 'userregtime', $stime);
             }
-            if($search['etime']){
+            if ($search['etime']) {
                 $etime = strtotime($search['etime']);
-                $args[] = array('AND',"userregtime <= :userregtime",'userregtime',$etime);
+                $args[] = array('AND', "userregtime <= :userregtime", 'userregtime', $etime);
             }
         }
-        if($search['mobile'])$args[] = array('AND',"mobile = :mobile",'mobile',$search['mobile']);
+        if ($search['mobile']) $args[] = array('AND', "mobile = :mobile", 'mobile', $search['mobile']);
 
         //选择入学年级
-        if($search['normal_favor']){
-            $args[] = array('AND',"normal_favor = :normal_favor",'normal_favor',$search['normal_favor']);
+        if ($search['normal_favor']) {
+            $args[] = array('AND', "normal_favor = :normal_favor", 'normal_favor', $search['normal_favor']);
             $targs = array();
-            $targs[] = array("AND","planyear = :planyear","planyear",$search['normal_favor']);
+            $targs[] = array("AND", "planyear = :planyear", "planyear", $search['normal_favor']);
             $plans = $this->edu->getPlansByArgs($targs);
-            $this->tpl->assign('tmajors',$plans);
+            $this->tpl->assign('tmajors', $plans);
         }
 
         //选择专业
-        if($search['userreferrer']){
-            $args[] = array('AND',"userreferrer = :userreferrer",'userreferrer',$search['userreferrer']);
-            if($search['normal_favor']){
-                $this->course = $this->G->make('course','course');
+        if ($search['userreferrer']) {
+            $args[] = array('AND', "userreferrer = :userreferrer", 'userreferrer', $search['userreferrer']);
+            if ($search['normal_favor']) {
+                $this->course = $this->G->make('course', 'course');
                 $targs = array();
-                $targs[] = array("AND","planyear = :planyear","planyear",$search['normal_favor']);
-                $targs[] = array("AND","major = :major","major",$search['userreferrer']);
+                $targs[] = array("AND", "planyear = :planyear", "planyear", $search['normal_favor']);
+                $targs[] = array("AND", "major = :major", "major", $search['userreferrer']);
                 $plan = $this->edu->getPlanByArgs($targs);
                 $targs = array();
-                $targs[] = array("AND","pdplanid = :pdplanid","pdplanid",$plan['planid']);
-                $details = $this->edu->getPlanDetailList($targs,1,100);
+                $targs[] = array("AND", "pdplanid = :pdplanid", "pdplanid", $plan['planid']);
+                $details = $this->edu->getPlanDetailList($targs, 1, 100);
                 $courses = $this->course->getAllCourses();
                 $subjects = array();
-                foreach($details['data'] as $detail)
-                {
-                    foreach($detail['pdcourse'] as $cs)
-                    {
-                        if(!$subjects[$courses[$cs]['cssubjectid']])
-                        {
+                foreach ($details['data'] as $detail) {
+                    foreach ($detail['pdcourse'] as $cs) {
+                        if (!$subjects[$courses[$cs]['cssubjectid']]) {
                             $subjects[$courses[$cs]['cssubjectid']] = $this->subjects[$courses[$cs]['cssubjectid']];
                         }
                     }
                 }
-                $this->tpl->assign('tsubjects',$subjects);
+                $this->tpl->assign('tsubjects', $subjects);
             }
         }
 
         //选择科目
-        if($search['subjects']){
+        if ($search['subjects']) {
             $ta = array();
-            $ta[] = array("AND","basicsubjectid = :basicsubjectid","basicsubjectid",$search['subjects']);
+            $ta[] = array("AND", "basicsubjectid = :basicsubjectid", "basicsubjectid", $search['subjects']);
             $bs = $this->basic->getBasicsByArgs($ta);
             $ids = array();
-            foreach($bs as $b)
-            {
+            foreach ($bs as $b) {
                 $ids[] = $b['basicid'];
             }
-            $ids = implode(',',$ids);
-            if(!$ids)$ids = 0;
-            $args[] = array('AND',"ehbasicid in ({$ids})");
+            $ids = implode(',', $ids);
+            if (!$ids) $ids = 0;
+            $args[] = array('AND', "ehbasicid in ({$ids})");
         }
 
 
         //学习状态
-        if($search['normal_rest'])
-        {
-            if($search['normal_rest'] == 1)
-                $args[] = array('AND',"normal_rest = 1");
+        if ($search['normal_rest']) {
+            if ($search['normal_rest'] == 1)
+                $args[] = array('AND', "normal_rest = 1");
             else
-                $args[] = array('AND',"normal_rest = 0");
+                $args[] = array('AND', "normal_rest = 0");
         }
         //毕业状态
-        if($search['normal_finish'])
-        {
-            if($search['normal_finish'] == 1)
-                $args[] = array('AND',"normal_finish = 1");
+        if ($search['normal_finish']) {
+            if ($search['normal_finish'] == 1)
+                $args[] = array('AND', "normal_finish = 1");
             else
-                $args[] = array('AND',"normal_finish = 0");
+                $args[] = array('AND', "normal_finish = 0");
         }
         //缴费状态
-        if($search['userischeck'])
-        {
-            if($search['userischeck'] == 1)
-                $args[] = array('AND',"userischeck = 1");
+        if ($search['userischeck']) {
+            if ($search['userischeck'] == 1)
+                $args[] = array('AND', "userischeck = 1");
             else
-                $args[] = array('AND',"userischeck = 0");
+                $args[] = array('AND', "userischeck = 0");
         }
 
 
-        $exams = $this->favor->getExamHistoryListByArgs($page,100,$args);
-        $this->tpl->assign('exams',$exams);
-        $this->tpl->assign('fields',$fields);
-        $this->tpl->assign('search',$search);
-        $this->tpl->assign('u',$u);
-        $this->tpl->assign('page',$page);
+        $exams = $this->favor->getExamHistoryListByArgs($page, 100, $args);
+        $this->tpl->assign('exams', $exams);
+        $this->tpl->assign('fields', $fields);
+        $this->tpl->assign('search', $search);
+        $this->tpl->assign('u', $u);
+        $this->tpl->assign('page', $page);
         $this->tpl->display('student_score');
     }
 
     private function outscore()
     {
-        $this->favor = $this->G->make('favor','exam');
+        $this->favor = $this->G->make('favor', 'exam');
         $this->files = $this->G->make('files');
         $search = $this->ev->get('search');
         $args = array();
         $userid = $this->ev->get('userid');
-        if($userid)
-        {
-            $fname = 'data/score/'.TIME.'-'.$userid.'-score.csv';
+        if ($userid) {
+            $fname = 'data/score/' . TIME . '-' . $userid . '-score.csv';
             //$args[] = array('AND',"usersequence =  :usersequence","usersequence",$this->cuser['usersequence']);
-            $args[] =  array('AND',"ehuserid = :ehuserid",'ehuserid',$userid);
-            $args[] =  array('AND',"ehneedresit = 0");
-            $args[] =  array('AND',"ehtype = 2");
-            $args[] = array('AND',"usergroupid IN (8,10)");
-            $args[] = array('AND',"usersequence =  :usersequence","usersequence",$this->cuser['usersequence']);
-            if($search['stime'])
-            {
+            $args[] = array('AND', "ehuserid = :ehuserid", 'ehuserid', $userid);
+            $args[] = array('AND', "ehneedresit = 0");
+            $args[] = array('AND', "ehtype = 2");
+            $args[] = array('AND', "usergroupid IN (8,10)");
+            $args[] = array('AND', "usersequence =  :usersequence", "usersequence", $this->cuser['usersequence']);
+            if ($search['stime']) {
                 $stime = strtotime($search['stime']);
-                $args[] = array('AND',"ehstarttime >= :stime",'stime',$stime);
+                $args[] = array('AND', "ehstarttime >= :stime", 'stime', $stime);
             }
-            if($search['etime'])
-            {
+            if ($search['etime']) {
                 $etime = strtotime($search['etime']);
-                $args[] = array('AND',"ehstarttime <= :etime",'etime',$etime);
+                $args[] = array('AND', "ehstarttime <= :etime", 'etime', $etime);
             }
-            if($search['sscore'])
-            {
-                $args[] = array('AND',"ehscore >= :sscore",'sscore',$search['sscore']);
+            if ($search['sscore']) {
+                $args[] = array('AND', "ehscore >= :sscore", 'sscore', $search['sscore']);
             }
-            if($search['escore'])
-            {
-                $args[] = array('AND',"ehscore <= :escore",'escore',$search['escore']);
+            if ($search['escore']) {
+                $args[] = array('AND', "ehscore <= :escore", 'escore', $search['escore']);
             }
-            if($search['examid'])
-            {
-                $args[] = array('AND',"ehexamid = :ehexamid",'ehexamid',$search['examid']);
+            if ($search['examid']) {
+                $args[] = array('AND', "ehexamid = :ehexamid", 'ehexamid', $search['examid']);
             }
 
-            $sf = array('usertruename','normal_schID','normal_favor','userreferrer','ehusername','ehscore','ehexam','ehstarttime');
+            $sf = array('usertruename', 'normal_schID', 'normal_favor', 'userreferrer', 'ehusername', 'ehscore', 'ehexam', 'ehstarttime');
             //$sf = array('ehusername','ehscore','ehexam','ehstarttime');
-            $rs = $this->favor->getAllExamHistoryByArgs($args,$sf);
+            $rs = $this->favor->getAllExamHistoryByArgs($args, $sf);
             $r = array();
-            foreach($rs as $p)
-            {
-                $tmp = array('ehexam' => iconv("UTF-8","GBK",$p['ehexam']),'ehscore' => $p['ehscore']);
-                $tmp['ehstarttime'] = date('Y-m-d H:i:s',$p['ehstarttime']);
+            foreach ($rs as $p) {
+                $tmp = array('ehexam' => iconv("UTF-8", "GBK", $p['ehexam']), 'ehscore' => $p['ehscore']);
+                $tmp['ehstarttime'] = date('Y-m-d H:i:s', $p['ehstarttime']);
                 $r[] = $tmp;
             }
-            if($this->files->outCsv($fname,$r))
+            if ($this->files->outCsv($fname, $r))
                 $message = array(
                     'statusCode' => 200,
                     "message" => "成绩导出成功，转入下载页面，如果浏览器没有相应，请<a href=\"{$fname}\">点此下载</a>",
@@ -428,8 +464,7 @@ class action extends app
                     'statusCode' => 300,
                     "message" => "成绩导出失败"
                 );
-        }
-        else
+        } else
             $message = array(
                 'statusCode' => 300,
                 "message" => "请选择用户"
@@ -441,90 +476,80 @@ class action extends app
     {
         $objPHPExcel = new PHPExcel();
 
-        $this->favor = $this->G->make('favor','exam');
+        $this->favor = $this->G->make('favor', 'exam');
         $this->files = $this->G->make('files');
         $search = $this->ev->get('search');
         $args = array();
         $appid = 'user';
-        $app = $this->G->make('apps','core')->getApp($appid);
-        $this->tpl->assign('app',$app);
+        $app = $this->G->make('apps', 'core')->getApp($appid);
+        $this->tpl->assign('app', $app);
         $fields = array();
-        $tpfields = explode(',',$app['appsetting']['outfields']);
-        foreach($tpfields as $f)
-        {
+        $tpfields = explode(',', $app['appsetting']['outfields']);
+        foreach ($tpfields as $f) {
             $tf = $this->module->getFieldByNameAndModuleid($f);
-            if($tf && $tf['fieldappid'] == 'user')
-            {
+            if ($tf && $tf['fieldappid'] == 'user') {
                 $fields[$tf['fieldid']] = $tf;
             }
         }
 //        $fname = 'data/score/'.TIME.'-'.$userid.'-score.csv';
-        $args[] =  array('AND',"ehneedresit = 0");
-        $args[] =  array('AND',"ehtype = 2");
-        $args[] = array('AND',"usergroupid IN (8,10)");
-        $args[] = array('AND',"usersequence =  :usersequence","usersequence",$this->cuser['usersequence']);
-        if($search['stime'])
-        {
+        $args[] = array('AND', "ehneedresit = 0");
+        $args[] = array('AND', "ehtype = 2");
+        $args[] = array('AND', "usergroupid IN (8,10)");
+        $args[] = array('AND', "usersequence =  :usersequence", "usersequence", $this->cuser['usersequence']);
+        if ($search['stime']) {
             $stime = strtotime($search['stime']);
-            $args[] = array('AND',"ehstarttime >= :stime",'stime',$stime);
+            $args[] = array('AND', "ehstarttime >= :stime", 'stime', $stime);
         }
-        if($search['etime'])
-        {
+        if ($search['etime']) {
             $etime = strtotime($search['etime']);
-            $args[] = array('AND',"ehstarttime <= :etime",'etime',$etime);
+            $args[] = array('AND', "ehstarttime <= :etime", 'etime', $etime);
         }
-        if($search['sscore'])
-        {
-            $args[] = array('AND',"ehscore >= :sscore",'sscore',$search['sscore']);
+        if ($search['sscore']) {
+            $args[] = array('AND', "ehscore >= :sscore", 'sscore', $search['sscore']);
         }
-        if($search['escore'])
-        {
-            $args[] = array('AND',"ehscore <= :escore",'escore',$search['escore']);
+        if ($search['escore']) {
+            $args[] = array('AND', "ehscore <= :escore", 'escore', $search['escore']);
         }
-        if($search['examid'])
-        {
-            $args[] = array('AND',"ehexamid = :ehexamid",'ehexamid',$search['examid']);
+        if ($search['examid']) {
+            $args[] = array('AND', "ehexamid = :ehexamid", 'ehexamid', $search['examid']);
         }
-        if($search['userid'])$args[] = array('AND',"userid = :userid",'userid',$search['userid']);
-        if($search['username'])$args[] = array('AND',"username LIKE :username",'username','%'.$search['username'].'%');
-        if($search['useremail'])$args[] = array('AND',"useremail  LIKE :useremail",'useremail','%'.$search['useremail'].'%');
-        if($search['stime'] || $search['etime'])
-        {
-            if(!is_array($args))$args = array();
-            if($search['stime']){
+        if ($search['userid']) $args[] = array('AND', "userid = :userid", 'userid', $search['userid']);
+        if ($search['username']) $args[] = array('AND', "username LIKE :username", 'username', '%' . $search['username'] . '%');
+        if ($search['useremail']) $args[] = array('AND', "useremail  LIKE :useremail", 'useremail', '%' . $search['useremail'] . '%');
+        if ($search['stime'] || $search['etime']) {
+            if (!is_array($args)) $args = array();
+            if ($search['stime']) {
                 $stime = strtotime($search['stime']);
-                $args[] = array('AND',"userregtime >= :userregtime",'userregtime',$stime);
+                $args[] = array('AND', "userregtime >= :userregtime", 'userregtime', $stime);
             }
-            if($search['etime']){
+            if ($search['etime']) {
                 $etime = strtotime($search['etime']);
-                $args[] = array('AND',"userregtime <= :userregtime",'userregtime',$etime);
+                $args[] = array('AND', "userregtime <= :userregtime", 'userregtime', $etime);
             }
         }
-        if($search['mobile'])$args[] = array('AND',"mobile = :mobile",'mobile',$search['mobile']);
-        if($search['normal_favor'])$args[] = array('AND',"normal_favor = :normal_favor",'normal_favor',$search['normal_favor']);
-        if($search['userreferrer'])$args[] = array('AND',"userreferrer = :userreferrer",'userreferrer',$search['userreferrer']);
-	if($search['subjects']){
+        if ($search['mobile']) $args[] = array('AND', "mobile = :mobile", 'mobile', $search['mobile']);
+        if ($search['normal_favor']) $args[] = array('AND', "normal_favor = :normal_favor", 'normal_favor', $search['normal_favor']);
+        if ($search['userreferrer']) $args[] = array('AND', "userreferrer = :userreferrer", 'userreferrer', $search['userreferrer']);
+        if ($search['subjects']) {
             $ta = array();
-            $ta[] = array("AND","basicsubjectid = :basicsubjectid","basicsubjectid",$search['subjects']);
+            $ta[] = array("AND", "basicsubjectid = :basicsubjectid", "basicsubjectid", $search['subjects']);
             $bs = $this->basic->getBasicsByArgs($ta);
             $ids = array();
-            foreach($bs as $b)
-            {
+            foreach ($bs as $b) {
                 $ids[] = $b['basicid'];
             }
-            $ids = implode(',',$ids);
-            if(!$ids)$ids = 0;
-            $args[] = array('AND',"ehbasicid in ({$ids})");
+            $ids = implode(',', $ids);
+            if (!$ids) $ids = 0;
+            $args[] = array('AND', "ehbasicid in ({$ids})");
         }
-        $sf = array('usertruename','normal_schID','normal_favor','userreferrer','ehusername','ehscore','ehexam','ehstarttime');
-        foreach($fields as $p)
-        {
+        $sf = array('usertruename', 'normal_schID', 'normal_favor', 'userreferrer', 'ehusername', 'ehscore', 'ehexam', 'ehstarttime');
+        foreach ($fields as $p) {
             $sf[] = $p['field'];
         }
-        $rs = $this->favor->getAllExamHistoryByArgs($args,$sf,'ehscore desc');
+        $rs = $this->favor->getAllExamHistoryByArgs($args, $sf, 'ehscore desc');
 
         $objPHPExcel->setActiveSheetIndex(0);//指定活动的sheet为0，也就是第一个
-        $objSheet=$objPHPExcel->getActiveSheet();//获取活动的sheet
+        $objSheet = $objPHPExcel->getActiveSheet();//获取活动的sheet
         $objSheet->setTitle("成绩查询");
         $objSheet->getRowDimension('1')->setRowHeight(20);//设置第一行高度
         $objSheet->getColumnDimension('A')->setWidth(10);//设置列宽度
@@ -533,26 +558,26 @@ class action extends app
         $objSheet->getColumnDimension('D')->setWidth(15);//设置列宽度
         $objSheet->getStyle("A1:D1")->getFont()->setName("宋体")->setSize(16)->setBold(true);
         $objSheet->getStyle("A1:D1")->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);//居中
-        $objSheet->getStyle('C')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT );//设置文字居左
+        $objSheet->getStyle('C')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);//设置文字居左
         $objSheet->getStyle("A2:D2")->getFont()->setName("宋体")->setSize(14)->setBold(true);
-        $grade=$rs["0"]["normal_favor"];
-        $major=$rs["0"]["userreferrer"];
-        $ehexam=$rs["0"]["ehexam"];
-        $objSheet->setCellValue('A1', $grade."-".$major."-".$ehexam);
+        $grade = $rs["0"]["normal_favor"];
+        $major = $rs["0"]["userreferrer"];
+        $ehexam = $rs["0"]["ehexam"];
+        $objSheet->setCellValue('A1', $grade . "-" . $major . "-" . $ehexam);
         $objSheet->mergeCells("A1:D1");//合并单元格
 
-        $objSheet->setCellValue("A2","姓名")->setCellValue("B2","学号")->
-        setCellValue("C2","成绩")->setCellValue("D2","考试时间");
-        $i=3;
-        foreach ($rs as $key=>$val){
-            $thedate=date("Y-m-d",$val["ehstarttime"]);
-            $objSheet->setCellValue("A".$i,$val["usertruename"])->setCellValue("B".$i,$val["normal_schID"])->setCellValue("C".$i,$val["ehscore"])->
-            setCellValue("D".$i,$thedate);
+        $objSheet->setCellValue("A2", "姓名")->setCellValue("B2", "学号")->
+        setCellValue("C2", "成绩")->setCellValue("D2", "考试时间");
+        $i = 3;
+        foreach ($rs as $key => $val) {
+            $thedate = date("Y-m-d", $val["ehstarttime"]);
+            $objSheet->setCellValue("A" . $i, $val["usertruename"])->setCellValue("B" . $i, $val["normal_schID"])->setCellValue("C" . $i, $val["ehscore"])->
+            setCellValue("D" . $i, $thedate);
             $i++;
         }
-        $objWriter=PHPExcel_IOFactory::createWriter($objPHPExcel,"Excel5");
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, "Excel5");
         header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename='.$grade.'-'.$major.'-'.$ehexam.'.xls');
+        header('Content-Disposition: attachment;filename=' . $grade . '-' . $major . '-' . $ehexam . '.xls');
         header('Cache-Control: max-age=0');
         $objWriter->save("php://output");
         exit;
@@ -587,23 +612,22 @@ class action extends app
         $userid = $this->ev->get('userid');
         $user = $this->user->getUserById($userid);
         $page = $this->ev->get('page');
-        $args = array(array("AND","prsuserid = userid"));
-        $args[] = array("AND","prsuserid = :prsuserid","prsuserid",$userid);
-        $progresses = $this->progress->getUserProgressesListByArgs($args,$page);
+        $args = array(array("AND", "prsuserid = userid"));
+        $args[] = array("AND", "prsuserid = :prsuserid", "prsuserid", $userid);
+        $progresses = $this->progress->getUserProgressesListByArgs($args, $page);
         $courses = array();
         $basics = array();
-        foreach($progresses['data'] as $p)
-        {
-            if(!$courses[$p['prscourseid']])
+        foreach ($progresses['data'] as $p) {
+            if (!$courses[$p['prscourseid']])
                 $courses[$p['prscourseid']] = $this->course->getCourseById($p['prscourseid']);
-            if(!$basics[$p['prsexamid']])
+            if (!$basics[$p['prsexamid']])
                 $basics[$p['prsexamid']] = $this->basic->getBasicById($p['prsexamid']);
         }
-        $this->tpl->assign('status',array('未完成','已完成'));
-        $this->tpl->assign('basics',$basics);
-        $this->tpl->assign('user',$user);
-        $this->tpl->assign('courses',$courses);
-        $this->tpl->assign('progresses',$progresses);
+        $this->tpl->assign('status', array('未完成', '已完成'));
+        $this->tpl->assign('basics', $basics);
+        $this->tpl->assign('user', $user);
+        $this->tpl->assign('courses', $courses);
+        $this->tpl->assign('progresses', $progresses);
         $this->tpl->display('student_showprocess');
     }
 
@@ -612,11 +636,11 @@ class action extends app
         $userid = $this->ev->get('userid');
         $user = $this->user->getUserById($userid);
         $group = $this->user->getGroupById($user['usergroupid']);
-        $fields = $this->module->getMoudleFields($group['groupmoduleid'],array('iscurrentuser'=> $userid == $this->_user['sessionuserid'],'group' => $this->user->getGroupById(1)),'user');
-        $infos = $this->html->buildInfo($fields,$user);
-        $this->tpl->assign('moduleid',$group['groupmoduleid']);
-        $this->tpl->assign('infos',$infos);
-        $this->tpl->assign('user',$user);
+        $fields = $this->module->getMoudleFields($group['groupmoduleid'], array('iscurrentuser' => $userid == $this->_user['sessionuserid'], 'group' => $this->user->getGroupById(1)), 'user');
+        $infos = $this->html->buildInfo($fields, $user);
+        $this->tpl->assign('moduleid', $group['groupmoduleid']);
+        $this->tpl->assign('infos', $infos);
+        $this->tpl->assign('user', $user);
         $this->tpl->display('student_show');
     }
 
@@ -626,22 +650,20 @@ class action extends app
         $search = $this->ev->get('search');
         $args = array();
         $userid = $this->ev->get('userid');
-        if($userid)
-        {
-            $fname = 'data/score/'.TIME.'-'.$userid.'-process.csv';
-            $args[] =  array('AND',"prsuserid = :prsuserid",'prsuserid',$userid);
-            $rs = $this->progress->getProgressesByArgs($args,'prsuserid desc');
+        if ($userid) {
+            $fname = 'data/score/' . TIME . '-' . $userid . '-process.csv';
+            $args[] = array('AND', "prsuserid = :prsuserid", 'prsuserid', $userid);
+            $rs = $this->progress->getProgressesByArgs($args, 'prsuserid desc');
             $r = array();
-            foreach($rs as $p)
-            {
+            foreach ($rs as $p) {
                 $tmp = array();
-                $tmp['course'] = iconv("UTF-8","GBK",$p['cstitle']);
-                $tmp['prspersent'] = $p['prspersent'].'%';
-                $tmp['basic'] = iconv("UTF-8","GBK",$p['basic']);
-                $tmp['basicpersent'] = $p['prsexamstatus']?'100%':'0%';
+                $tmp['course'] = iconv("UTF-8", "GBK", $p['cstitle']);
+                $tmp['prspersent'] = $p['prspersent'] . '%';
+                $tmp['basic'] = iconv("UTF-8", "GBK", $p['basic']);
+                $tmp['basicpersent'] = $p['prsexamstatus'] ? '100%' : '0%';
                 $r[] = $tmp;
             }
-            if($this->files->outCsv($fname,$r))
+            if ($this->files->outCsv($fname, $r))
                 $message = array(
                     'statusCode' => 200,
                     "message" => "成绩导出成功，转入下载页面，如果浏览器没有相应，请<a href=\"{$fname}\">点此下载</a>",
@@ -653,8 +675,7 @@ class action extends app
                     'statusCode' => 300,
                     "message" => "成绩导出失败"
                 );
-        }
-        else
+        } else
             $message = array(
                 'statusCode' => 300,
                 "message" => "请选择用户"
@@ -667,40 +688,38 @@ class action extends app
         $this->files = $this->G->make('files');
         $search = $this->ev->get('search');
         $args = array();
-        $fname = 'data/score/'.TIME.'-'.$userid.'-process.csv';
-        $args[] = array('AND',"usergroupid IN (8,10)");
-        $args[] = array('AND',"usersequence =  :usersequence","usersequence",$this->cuser['usersequence']);
-        if($search['userid'])$args[] = array('AND',"userid = :userid",'userid',$search['userid']);
-        if($search['username'])$args[] = array('AND',"username LIKE :username",'username','%'.$search['username'].'%');
-        if($search['useremail'])$args[] = array('AND',"useremail  LIKE :useremail",'useremail','%'.$search['useremail'].'%');
-        if($search['stime'] || $search['etime'])
-        {
-            if(!is_array($args))$args = array();
-            if($search['stime']){
+        $fname = 'data/score/' . TIME . '-' . $userid . '-process.csv';
+        $args[] = array('AND', "usergroupid IN (8,10)");
+        $args[] = array('AND', "usersequence =  :usersequence", "usersequence", $this->cuser['usersequence']);
+        if ($search['userid']) $args[] = array('AND', "userid = :userid", 'userid', $search['userid']);
+        if ($search['username']) $args[] = array('AND', "username LIKE :username", 'username', '%' . $search['username'] . '%');
+        if ($search['useremail']) $args[] = array('AND', "useremail  LIKE :useremail", 'useremail', '%' . $search['useremail'] . '%');
+        if ($search['stime'] || $search['etime']) {
+            if (!is_array($args)) $args = array();
+            if ($search['stime']) {
                 $stime = strtotime($search['stime']);
-                $args[] = array('AND',"userregtime >= :userregtime",'userregtime',$stime);
+                $args[] = array('AND', "userregtime >= :userregtime", 'userregtime', $stime);
             }
-            if($search['etime']){
+            if ($search['etime']) {
                 $etime = strtotime($search['etime']);
-                $args[] = array('AND',"userregtime <= :userregtime",'userregtime',$etime);
+                $args[] = array('AND', "userregtime <= :userregtime", 'userregtime', $etime);
             }
         }
-        if($search['mobile'])$args[] = array('AND',"mobile = :mobile",'mobile',$search['mobile']);
-        if($search['normal_favor'])$args[] = array('AND',"normal_favor = :normal_favor",'normal_favor',$search['normal_favor']);
-        if($search['userreferrer'])$args[] = array('AND',"userreferrer = :userreferrer",'userreferrer',$search['userreferrer']);
+        if ($search['mobile']) $args[] = array('AND', "mobile = :mobile", 'mobile', $search['mobile']);
+        if ($search['normal_favor']) $args[] = array('AND', "normal_favor = :normal_favor", 'normal_favor', $search['normal_favor']);
+        if ($search['userreferrer']) $args[] = array('AND', "userreferrer = :userreferrer", 'userreferrer', $search['userreferrer']);
         $rs = $this->progress->getAllUserProgressesByArgs($args);
         $r = array();
-        foreach($rs as $p)
-        {
+        foreach ($rs as $p) {
             $tmp = array();
-            $tmp['username'] = 'ID'.iconv("UTF-8","GBK",$p['username']);
-            $tmp['course'] = iconv("UTF-8","GBK",$p['cstitle']);
-            $tmp['prspersent'] = $p['prspersent'].'%';
-            $tmp['basic'] = iconv("UTF-8","GBK",$p['basic']);
-            $tmp['basicpersent'] = $p['prsexamstatus']?'100%':'0%';
+            $tmp['username'] = 'ID' . iconv("UTF-8", "GBK", $p['username']);
+            $tmp['course'] = iconv("UTF-8", "GBK", $p['cstitle']);
+            $tmp['prspersent'] = $p['prspersent'] . '%';
+            $tmp['basic'] = iconv("UTF-8", "GBK", $p['basic']);
+            $tmp['basicpersent'] = $p['prsexamstatus'] ? '100%' : '0%';
             $r[] = $tmp;
         }
-        if($this->files->outCsv($fname,$r))
+        if ($this->files->outCsv($fname, $r))
             $message = array(
                 'statusCode' => 200,
                 "message" => "成绩导出成功，转入下载页面，如果浏览器没有相应，请<a href=\"{$fname}\">点此下载</a>",
@@ -717,162 +736,147 @@ class action extends app
 
     private function progress()
     {
-        $this->log = $this->G->make('log','course');
-        $this->content = $this->G->make('content','course');
+        $this->log = $this->G->make('log', 'course');
+        $this->content = $this->G->make('content', 'course');
         $page = $this->ev->get('page');
         $prsid = $this->ev->get('prsid');
         $progress = $this->progress->getProgressById($prsid);
-        $logs = $this->log->getLogsByCsid($progress['prscourseid'],$progress['prsuserid']);
-        $oknumber = $this->log->getPassedLogsNumberByCsid($progress['prscourseid'],$progress['prsuserid']);
+        $logs = $this->log->getLogsByCsid($progress['prscourseid'], $progress['prsuserid']);
+        $oknumber = $this->log->getPassedLogsNumberByCsid($progress['prscourseid'], $progress['prsuserid']);
         $args = array();
-        $args[] = array("AND","coursecsid = :coursecsid","coursecsid",$progress['prscourseid']);
+        $args[] = array("AND", "coursecsid = :coursecsid", "coursecsid", $progress['prscourseid']);
         $course = $this->course->getCourseById($progress['prscourseid']);
-        $courses = $this->content->getCourseList($args,$page,100);
-        $oknumber = intval($oknumber*100/$courses['number']);
+        $courses = $this->content->getCourseList($args, $page, 100);
+        $oknumber = intval($oknumber * 100 / $courses['number']);
         $user = $this->user->getUserById($progress['prsuserid']);
-        $this->tpl->assign('user',$user);
-        $this->tpl->assign('courses',$courses);
-        $this->tpl->assign('logs',$logs);
-        $this->tpl->assign('course',$course);
-        $this->tpl->assign('progress',$progress);
-        $this->tpl->assign('oknumber',$oknumber);
-        $this->tpl->assign('courses',$courses);
+        $this->tpl->assign('user', $user);
+        $this->tpl->assign('courses', $courses);
+        $this->tpl->assign('logs', $logs);
+        $this->tpl->assign('course', $course);
+        $this->tpl->assign('progress', $progress);
+        $this->tpl->assign('oknumber', $oknumber);
+        $this->tpl->assign('courses', $courses);
         $this->tpl->display('student_process');
     }
 
     private function info()
     {
-        $page = $this->ev->get('page')?$this->ev->get('page'):1;
+        $page = $this->ev->get('page') ? $this->ev->get('page') : 1;
         $search = $this->ev->get('search');
         $u = '';
-        if($search)
-        {
-            foreach($search as $key => $arg)
-            {
+        if ($search) {
+            foreach ($search as $key => $arg) {
                 $u .= "&search[{$key}]={$arg}";
             }
         }
         $args = array();
-        $args[] = array('AND',"usergroupid IN (8,10)");
-        $args[] = array('AND',"usersequence =  :usersequence","usersequence",$this->cuser['usersequence']);
-        if($search['userid'])$args[] = array('AND',"userid = :userid",'userid',$search['userid']);
-        if($search['usertruename'])$args[] = array('AND',"usertruename  LIKE :usertruename",'usertruename','%'.$search['usertruename'].'%');
-        if($search['normal_schID'])$args[] = array('AND',"normal_schID like :normal_schID",'normal_schID','%'.$search['normal_schID'].'%');
-        if($search['username'])$args[] = array('AND',"username LIKE :username",'username','%'.$search['username'].'%');
-        if($search['useremail'])$args[] = array('AND',"useremail  LIKE :useremail",'useremail','%'.$search['useremail'].'%');
+        $args[] = array('AND', "usergroupid IN (8,10)");
+        $args[] = array('AND', "usersequence =  :usersequence", "usersequence", $this->cuser['usersequence']);
+        if ($search['userid']) $args[] = array('AND', "userid = :userid", 'userid', $search['userid']);
+        if ($search['usertruename']) $args[] = array('AND', "usertruename  LIKE :usertruename", 'usertruename', '%' . $search['usertruename'] . '%');
+        if ($search['normal_schID']) $args[] = array('AND', "normal_schID like :normal_schID", 'normal_schID', '%' . $search['normal_schID'] . '%');
+        if ($search['username']) $args[] = array('AND', "username LIKE :username", 'username', '%' . $search['username'] . '%');
+        if ($search['useremail']) $args[] = array('AND', "useremail  LIKE :useremail", 'useremail', '%' . $search['useremail'] . '%');
 
-        if($search['stime'] || $search['etime'])
-        {
-            if(!is_array($args))$args = array();
-            if($search['stime']){
+        if ($search['stime'] || $search['etime']) {
+            if (!is_array($args)) $args = array();
+            if ($search['stime']) {
                 $stime = strtotime($search['stime']);
-                $args[] = array('AND',"userregtime >= :userregtime",'userregtime',$stime);
+                $args[] = array('AND', "userregtime >= :userregtime", 'userregtime', $stime);
             }
-            if($search['etime']){
+            if ($search['etime']) {
                 $etime = strtotime($search['etime']);
-                $args[] = array('AND',"userregtime <= :userregtime",'userregtime',$etime);
+                $args[] = array('AND', "userregtime <= :userregtime", 'userregtime', $etime);
             }
         }
-        if($search['mobile'])$args[] = array('AND',"mobile = :mobile",'mobile',$search['mobile']);
-        if($search['normal_favor'])
-        {
-            $args[] = array('AND',"normal_favor = :normal_favor",'normal_favor',$search['normal_favor']);
+        if ($search['mobile']) $args[] = array('AND', "mobile = :mobile", 'mobile', $search['mobile']);
+        if ($search['normal_favor']) {
+            $args[] = array('AND', "normal_favor = :normal_favor", 'normal_favor', $search['normal_favor']);
             $targs = array();
-            $targs[] = array("AND","planyear = :planyear","planyear",$search['normal_favor']);
+            $targs[] = array("AND", "planyear = :planyear", "planyear", $search['normal_favor']);
             $plans = $this->edu->getPlansByArgs($targs);
-            $this->tpl->assign('tmajors',$plans);
+            $this->tpl->assign('tmajors', $plans);
         }
         //if($search['userreferrer'])
         //    $args[] = array('AND',"userreferrer = :userreferrer",'userreferrer',$search['userreferrer']);
-        if($search['userreferrer']){
-            $args[] = array('AND',"userreferrer = :userreferrer",'userreferrer',$search['userreferrer']);
-            if($search['normal_favor']){
-                $this->course = $this->G->make('course','course');
+        if ($search['userreferrer']) {
+            $args[] = array('AND', "userreferrer = :userreferrer", 'userreferrer', $search['userreferrer']);
+            if ($search['normal_favor']) {
+                $this->course = $this->G->make('course', 'course');
                 $targs = array();
-                $targs[] = array("AND","planyear = :planyear","planyear",$search['normal_favor']);
-                $targs[] = array("AND","major = :major","major",$search['userreferrer']);
+                $targs[] = array("AND", "planyear = :planyear", "planyear", $search['normal_favor']);
+                $targs[] = array("AND", "major = :major", "major", $search['userreferrer']);
                 $plan = $this->edu->getPlanByArgs($targs);
                 $targs = array();
-                $targs[] = array("AND","pdplanid = :pdplanid","pdplanid",$plan['planid']);
-                $details = $this->edu->getPlanDetailList($targs,1,100);
+                $targs[] = array("AND", "pdplanid = :pdplanid", "pdplanid", $plan['planid']);
+                $details = $this->edu->getPlanDetailList($targs, 1, 100);
                 $courses = $this->course->getAllCourses();
                 $subjects = array();
-                foreach($details['data'] as $detail)
-                {
-                    foreach($detail['pdcourse'] as $cs)
-                    {
-                        if(!$subjects[$courses[$cs]['cssubjectid']])
-                        {
+                foreach ($details['data'] as $detail) {
+                    foreach ($detail['pdcourse'] as $cs) {
+                        if (!$subjects[$courses[$cs]['cssubjectid']]) {
                             $subjects[$courses[$cs]['cssubjectid']] = $this->subjects[$courses[$cs]['cssubjectid']];
                         }
                     }
                 }
-                $this->tpl->assign('tsubjects',$subjects);
+                $this->tpl->assign('tsubjects', $subjects);
             }
         }
-        if($search['normal_rest'])
-        {
-            if($search['normal_rest'] == 1)
-                $args[] = array('AND',"normal_rest = 1");
+        if ($search['normal_rest']) {
+            if ($search['normal_rest'] == 1)
+                $args[] = array('AND', "normal_rest = 1");
             else
-                $args[] = array('AND',"normal_rest = 0");
+                $args[] = array('AND', "normal_rest = 0");
         }
-        if($search['normal_finish'])
-        {
-            if($search['normal_finish'] == 1)
-                $args[] = array('AND',"normal_finish = 1");
+        if ($search['normal_finish']) {
+            if ($search['normal_finish'] == 1)
+                $args[] = array('AND', "normal_finish = 1");
             else
-                $args[] = array('AND',"normal_finish = 0");
+                $args[] = array('AND', "normal_finish = 0");
         }
-        if($search['userischeck'])
-        {
-            if($search['userischeck'] == 1)
-                $args[] = array('AND',"userischeck = 1");
+        if ($search['userischeck']) {
+            if ($search['userischeck'] == 1)
+                $args[] = array('AND', "userischeck = 1");
             else
-                $args[] = array('AND',"userischeck = 0");
+                $args[] = array('AND', "userischeck = 0");
         }
-        if($search['subjects'])
-        {
-            $courses = $this->course->getAllCourses(array(array("AND","cssubjectid = :cssubjectid","cssubjectid",$search['subjects'])));
+        if ($search['subjects']) {
+            $courses = $this->course->getAllCourses(array(array("AND", "cssubjectid = :cssubjectid", "cssubjectid", $search['subjects'])));
             $ids = array();
-            foreach($courses as $p)
-            {
+            foreach ($courses as $p) {
                 $ids[] = $p['csid'];
             }
-            $ids = implode(',',$ids);
-            if(!$ids)$ids = '0';
-            $args[] = array("AND","prscourseid in ({$ids})");
+            $ids = implode(',', $ids);
+            if (!$ids) $ids = '0';
+            $args[] = array("AND", "prscourseid in ({$ids})");
         }
 
-        
 
-        $progresses = $this->progress->getUserProgressesListByArgs($args,$page,100);
+        $progresses = $this->progress->getUserProgressesListByArgs($args, $page, 100);
 
         //var_dump($args);
-        
+
         //echo("<pre>");
         //var_dump($args);
         //echo("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         //var_dump($progresses);
         //echo("</pre>");
-        
-        
-       
+
+
         $courses = array();
         $times = array();
-        foreach($progresses['data'] as $p)
-        {
-            if(!$courses[$p['prscourseid']])
+        foreach ($progresses['data'] as $p) {
+            if (!$courses[$p['prscourseid']])
                 $courses[$p['prscourseid']] = $this->course->getCourseById($p['prscourseid']);
-            $times[$p['prsid']] = $this->course->getAllOpenCourseByUseridAndCsid($p['prsuserid'],$p['prscourseid']);
+            $times[$p['prsid']] = $this->course->getAllOpenCourseByUseridAndCsid($p['prsuserid'], $p['prscourseid']);
         }
-        $this->tpl->assign('status',array('未完成','已完成'));
-        $this->tpl->assign('times',$times);
-        $this->tpl->assign('courses',$courses);
-        $this->tpl->assign('progresses',$progresses);
-        $this->tpl->assign('search',$search);
-        $this->tpl->assign('u',$u);
-        $this->tpl->assign('page',$page);
+        $this->tpl->assign('status', array('未完成', '已完成'));
+        $this->tpl->assign('times', $times);
+        $this->tpl->assign('courses', $courses);
+        $this->tpl->assign('progresses', $progresses);
+        $this->tpl->assign('search', $search);
+        $this->tpl->assign('u', $u);
+        $this->tpl->assign('page', $page);
         $this->tpl->display('student_info');
     }
 
@@ -892,12 +896,10 @@ class action extends app
 
     private function batdel()
     {
-        if($this->ev->get('action') == 'delete')
-        {
+        if ($this->ev->get('action') == 'delete') {
             $page = $this->ev->get('page');
             $delids = $this->ev->get('delids');
-            foreach($delids as $userid => $p)
-            {
+            foreach ($delids as $userid => $p) {
                 $this->user->delUserById($userid);
             }
             $message = array(
@@ -913,11 +915,10 @@ class action extends app
     private function modify()
     {
         $page = $this->ev->get('page');
-        if($this->ev->get('modifyusergroup'))
-        {
+        if ($this->ev->get('modifyusergroup')) {
             $groupid = $this->ev->get('groupid');
             $userid = $this->ev->get('userid');
-            $this->user->modifyUserGroup($groupid,$userid);
+            $this->user->modifyUserGroup($groupid, $userid);
             $message = array(
                 'statusCode' => 200,
                 "message" => "操作成功",
@@ -925,14 +926,11 @@ class action extends app
                 "forwardUrl" => "index.php?edu-app-student&page={$page}{$this->u}"
             );
             exit(json_encode($message));
-        }
-		elseif($this->ev->get('setteachsubject'))
-        {
+        } elseif ($this->ev->get('setteachsubject')) {
             $userid = $this->ev->get('userid');
             $user = $this->user->getUserById($userid);
             $modules = $this->module->getModulesByApp('user');
-            if($modules[$user['groupmoduleid']]['modulecode'] != 'teacher')
-            {
+            if ($modules[$user['groupmoduleid']]['modulecode'] != 'teacher') {
                 $message = array(
                     'statusCode' => 300,
                     "message" => "此用户不是教师"
@@ -946,15 +944,13 @@ class action extends app
                 "forwardUrl" => "reload"
             );
             exit(json_encode($message));
-        }
-		elseif($this->ev->get('modifyuserinfo'))
-        {
+        } elseif ($this->ev->get('modifyuserinfo')) {
             $args = $this->ev->get('args');
             $userid = $this->ev->get('userid');
             $user = $this->user->getUserById($userid);
             $group = $this->user->getGroupById($user['usergroupid']);
-            $args = $this->module->tidyNeedFieldsPars($args,$group['groupmoduleid'],array('iscurrentuser'=> $userid == $this->_user['sessionuserid'],'group' => $this->user->getGroupById(1)),'user');
-            $id = $this->user->modifyUserInfo($args,$userid);
+            $args = $this->module->tidyNeedFieldsPars($args, $group['groupmoduleid'], array('iscurrentuser' => $userid == $this->_user['sessionuserid'], 'group' => $this->user->getGroupById(1)), 'user');
+            $id = $this->user->modifyUserInfo($args, $userid);
             $message = array(
                 'statusCode' => 200,
                 "message" => "操作成功",
@@ -962,14 +958,11 @@ class action extends app
                 "forwardUrl" => "index.php?edu-app-student&page={$page}{$this->u}"
             );
             exit(json_encode($message));
-        }
-		elseif($this->ev->get('modifyuserpassword'))
-        {
+        } elseif ($this->ev->get('modifyuserpassword')) {
             $args = $this->ev->get('args');
             $userid = $this->ev->get('userid');
-            if($args['password'] == $args['password2'] && $userid)
-            {
-                $id = $this->user->modifyUserPassword($args,$userid);
+            if ($args['password'] == $args['password2'] && $userid) {
+                $id = $this->user->modifyUserPassword($args, $userid);
                 $message = array(
                     'statusCode' => 200,
                     "message" => "操作成功",
@@ -977,77 +970,62 @@ class action extends app
                     "forwardUrl" => "index.php?edu-app-student&page={$page}{$this->u}"
                 );
                 exit(json_encode($message));
-            }
-            else
-            {
+            } else {
                 $message = array(
                     'statusCode' => 300,
                     "message" => "操作失败"
                 );
                 exit(json_encode($message));
             }
-        }
-        else
-        {
+        } else {
             $userid = $this->ev->get('userid');
             $user = $this->user->getUserById($userid);
             $group = $this->user->getGroupById($user['usergroupid']);
-            $fields = $this->module->getMoudleFields($group['groupmoduleid'],array('iscurrentuser'=> $userid == $this->_user['sessionuserid'],'group' => $this->user->getGroupById(1)),'user');
-            $forms = $this->html->buildHtml($fields,$user);
-            $this->tpl->assign('moduleid',$group['groupmoduleid']);
-            $this->tpl->assign('fields',$fields);
-            $this->tpl->assign('forms',$forms);
-            $this->tpl->assign('user',$user);
-            $this->tpl->assign('page',$page);
+            $fields = $this->module->getMoudleFields($group['groupmoduleid'], array('iscurrentuser' => $userid == $this->_user['sessionuserid'], 'group' => $this->user->getGroupById(1)), 'user');
+            $forms = $this->html->buildHtml($fields, $user);
+            $this->tpl->assign('moduleid', $group['groupmoduleid']);
+            $this->tpl->assign('fields', $fields);
+            $this->tpl->assign('forms', $forms);
+            $this->tpl->assign('user', $user);
+            $this->tpl->assign('page', $page);
             $this->tpl->display('student_modifyuser');
         }
     }
 
     private function batadd()
     {
-        if($this->ev->post('insertUser'))
-        {
+        if ($this->ev->post('insertUser')) {
             $uploadfile = $this->ev->get('uploadfile');
-            if(!file_exists($uploadfile))
-            {
+            if (!file_exists($uploadfile)) {
                 $message = array(
                     'statusCode' => 300,
                     "message" => "上传文件不存在"
                 );
                 exit(json_encode($message));
-            }
-            else
-            {
-                setlocale(LC_ALL,'zh_CN');
-                $handle = fopen($uploadfile,"r");
+            } else {
+                setlocale(LC_ALL, 'zh_CN');
+                $handle = fopen($uploadfile, "r");
                 $strings = $this->G->make('strings');
-                $app = $this->G->make('apps','core')->getApp('user');
-                $tpfields = explode(',',$app['appsetting']['regfields']);
-                while ($data = fgetcsv($handle))
-                {
+                $app = $this->G->make('apps', 'core')->getApp('user');
+                $tpfields = explode(',', $app['appsetting']['regfields']);
+                while ($data = fgetcsv($handle)) {
 
-                    if($data[0] && $data[1])
-                    {
+                    if ($data[0] && $data[1]) {
                         $args = array();
-                        $args['username'] = iconv("GBK","UTF-8",$data[0]);
-                        if($strings->isUserName($args['username']))
-                        {
+                        $args['username'] = iconv("GBK", "UTF-8", $data[0]);
+                        if ($strings->isUserName($args['username'])) {
                             $u = $this->user->getUserByUserName($args['username']);
-                            if(!$u)
-                            {
+                            if (!$u) {
                                 $args['useremail'] = $data[1];
-                                if($strings->isEmail($args['useremail']))
-                                {
+                                if ($strings->isEmail($args['useremail'])) {
                                     $u = $this->user->getUserByEmail($args['useremail']);
-                                    if(!$u)
-                                    {
-                                        if(!$data[2])$data[2] = '111111';
+                                    if (!$u) {
+                                        if (!$data[2]) $data[2] = '111111';
                                         $args['userpassword'] = md5($data[2]);
                                         $args['usergroupid'] = 9;
                                         $i = 3;
-                                        foreach($tpfields as $p)
-                                        {
-                                            $args[$p] = iconv("GBK","UTF-8",$data[$i]);
+                                        foreach ($tpfields as $p) {
+                                            $args[$p] = iconv("GBK", "UTF-8", $data[$i]);
                                             $i++;
                                         }
                                         $this->user->insertUser($args);
@@ -1066,28 +1044,23 @@ class action extends app
                 );
                 exit(json_encode($message));
             }
-        }
-        else
-        {
+        } else {
             $this->tpl->display('student_batadduser');
         }
     }
 
     private function add()
     {
-        if($this->ev->post('insertUser'))
-        {
+        if ($this->ev->post('insertUser')) {
             $args = $this->ev->post('args');
-            if($args['userpassword'] == $args['userpassword2'])
-            {
+            if ($args['userpassword'] == $args['userpassword2']) {
                 $userbyname = $this->user->getUserByUserName($args['username']);
                 $userbyemail = $this->user->getUserByEmail($args['useremail']);
-                if($userbyname)
+                if ($userbyname)
                     $errmsg = "这个用户名已经被注册了";
-                if($userbyemail)
+                if ($userbyemail)
                     $errmsg = "这个邮箱已经被注册了";
-                if($errmsg)
-                {
+                if ($errmsg) {
                     $message = array(
                         'statusCode' => 300,
                         "message" => "{$errmsg}"
@@ -1107,19 +1080,17 @@ class action extends app
                 );
                 exit(json_encode($message));
             }
-        }
-        else
-        {
+        } else {
             $modules = $this->module->getModulesByApp('user');
             $tmpmodules = array(
                 '9' => $modules['9']
             );
-            $fields = $this->module->getMoudleFields(9,array('iscurrentuser'=> false,'group' => $this->user->getGroupById(1)),'user');
+            $fields = $this->module->getMoudleFields(9, array('iscurrentuser' => false, 'group' => $this->user->getGroupById(1)), 'user');
             $forms = $this->html->buildHtml($fields);
-            $this->tpl->assign('moduleid',9);
-            $this->tpl->assign('fields',$fields);
-            $this->tpl->assign('forms',$forms);
-            $this->tpl->assign('modules',$tmpmodules);
+            $this->tpl->assign('moduleid', 9);
+            $this->tpl->assign('fields', $fields);
+            $this->tpl->assign('forms', $forms);
+            $this->tpl->assign('modules', $tmpmodules);
             $this->tpl->display('student_adduser');
         }
     }
@@ -1127,11 +1098,10 @@ class action extends app
     private function modifyschoolstatus()
     {
         $userid = $this->ev->get('userid');
-        if($this->ev->get('modifyuserinfo'))
-        {
+        if ($this->ev->get('modifyuserinfo')) {
             $targs = $this->ev->get('args');
-            if($targs['normal_finish'])
-            $id = $this->user->modifyUserInfo(array('normal_finish' => 1),$userid);
+            if ($targs['normal_finish'])
+                $id = $this->user->modifyUserInfo(array('normal_finish' => 1), $userid);
             $message = array(
                 'statusCode' => 200,
                 "message" => "操作成功",
@@ -1139,11 +1109,9 @@ class action extends app
                 "forwardUrl" => "reload"
             );
             exit(json_encode($message));
-        }
-        else
-        {
+        } else {
             $user = $this->user->getUserById($userid);
-            $this->tpl->assign('user',$user);
+            $this->tpl->assign('user', $user);
             $this->tpl->display('student_modifyschoolstatus');
         }
     }
@@ -1151,10 +1119,9 @@ class action extends app
     private function modifystudystatus()
     {
         $userid = $this->ev->get('userid');
-        if($this->ev->get('modifyuserinfo'))
-        {
+        if ($this->ev->get('modifyuserinfo')) {
             $args = $this->ev->get('args');
-            $id = $this->user->modifyUserInfo(array('normal_rest' => $args['normal_rest']),$userid);
+            $id = $this->user->modifyUserInfo(array('normal_rest' => $args['normal_rest']), $userid);
             $message = array(
                 'statusCode' => 200,
                 "message" => "操作成功",
@@ -1162,11 +1129,9 @@ class action extends app
                 "forwardUrl" => "reload"
             );
             exit(json_encode($message));
-        }
-        else
-        {
+        } else {
             $user = $this->user->getUserById($userid);
-            $this->tpl->assign('user',$user);
+            $this->tpl->assign('user', $user);
             $this->tpl->display('student_modifystudystatus');
         }
     }
@@ -1174,10 +1139,9 @@ class action extends app
     private function modifymajor()
     {
         $userid = $this->ev->get('userid');
-        if($this->ev->get('modifyuserinfo'))
-        {
+        if ($this->ev->get('modifyuserinfo')) {
             $args = $this->ev->get('args');
-            $id = $this->user->modifyUserInfo($args,$userid);
+            $id = $this->user->modifyUserInfo($args, $userid);
             $message = array(
                 'statusCode' => 200,
                 "message" => "操作成功",
@@ -1185,82 +1149,73 @@ class action extends app
                 "forwardUrl" => "reload"
             );
             exit(json_encode($message));
-        }
-        else
-        {
+        } else {
             $user = $this->user->getUserById($userid);
             $majors = $this->edu->getAllMajor();
-            $this->tpl->assign('majors',$majors);
-            $this->tpl->assign('user',$user);
+            $this->tpl->assign('majors', $majors);
+            $this->tpl->assign('user', $user);
             $this->tpl->display('student_modifymajor');
         }
     }
 
     private function index()
     {
-        $page = $this->ev->get('page')?$this->ev->get('page'):1;
+        $page = $this->ev->get('page') ? $this->ev->get('page') : 1;
         $search = $this->ev->get('search');
         $u = '';
-        if($search)
-        {
-            foreach($search as $key => $arg)
-            {
+        if ($search) {
+            foreach ($search as $key => $arg) {
                 $u .= "&search[{$key}]={$arg}";
             }
         }
         $args = array();
-        $args[] = array('AND',"usergroupid IN (8,10)");
-        $args[] = array('AND',"usersequence =  :usersequence","usersequence",$this->cuser['usersequence']);
-        if($search['userid'])$args[] = array('AND',"userid = :userid",'userid',$search['userid']);
-        if($search['usertruename'])$args[] = array('AND',"usertruename  LIKE :usertruename",'usertruename','%'.$search['usertruename'].'%');
+        $args[] = array('AND', "usergroupid IN (8,10)");
+        $args[] = array('AND', "usersequence =  :usersequence", "usersequence", $this->cuser['usersequence']);
+        if ($search['userid']) $args[] = array('AND', "userid = :userid", 'userid', $search['userid']);
+        if ($search['usertruename']) $args[] = array('AND', "usertruename  LIKE :usertruename", 'usertruename', '%' . $search['usertruename'] . '%');
 
 
-
-        if($search['normal_schID'])$args[] = array('AND',"normal_schID like :normal_schID",'normal_schID','%'.$search['normal_schID'].'%');
-        if($search['username'])$args[] = array('AND',"username LIKE :username",'username','%'.$search['username'].'%');
-        if($search['useremail'])$args[] = array('AND',"useremail  LIKE :useremail",'useremail','%'.$search['useremail'].'%');
-        if($search['stime'] || $search['etime'])
-        {
-            if(!is_array($args))$args = array();
-            if($search['stime']){
+        if ($search['normal_schID']) $args[] = array('AND', "normal_schID like :normal_schID", 'normal_schID', '%' . $search['normal_schID'] . '%');
+        if ($search['username']) $args[] = array('AND', "username LIKE :username", 'username', '%' . $search['username'] . '%');
+        if ($search['useremail']) $args[] = array('AND', "useremail  LIKE :useremail", 'useremail', '%' . $search['useremail'] . '%');
+        if ($search['stime'] || $search['etime']) {
+            if (!is_array($args)) $args = array();
+            if ($search['stime']) {
                 $stime = strtotime($search['stime']);
-                $args[] = array('AND',"userregtime >= :userregtime",'userregtime',$stime);
+                $args[] = array('AND', "userregtime >= :userregtime", 'userregtime', $stime);
             }
-            if($search['etime']){
+            if ($search['etime']) {
                 $etime = strtotime($search['etime']);
-                $args[] = array('AND',"userregtime <= :userregtime",'userregtime',$etime);
+                $args[] = array('AND', "userregtime <= :userregtime", 'userregtime', $etime);
             }
         }
-        if($search['mobile'])$args[] = array('AND',"mobile = :mobile",'mobile',$search['mobile']);
-        if($search['normal_favor'])$args[] = array('AND',"normal_favor = :normal_favor",'normal_favor',$search['normal_favor']);
-        if($search['userreferrer'])$args[] = array('AND',"userreferrer = :userreferrer",'userreferrer',$search['userreferrer']);
-        if($search['normal_rest'])
-        {
-            if($search['normal_rest'] == 1)
-                $args[] = array('AND',"normal_rest = 1");
+        if ($search['mobile']) $args[] = array('AND', "mobile = :mobile", 'mobile', $search['mobile']);
+        if ($search['normal_favor']) $args[] = array('AND', "normal_favor = :normal_favor", 'normal_favor', $search['normal_favor']);
+        if ($search['userreferrer']) $args[] = array('AND', "userreferrer = :userreferrer", 'userreferrer', $search['userreferrer']);
+        if ($search['normal_rest']) {
+            if ($search['normal_rest'] == 1)
+                $args[] = array('AND', "normal_rest = 1");
             else
-                $args[] = array('AND',"normal_rest = 0");
+                $args[] = array('AND', "normal_rest = 0");
         }
-        if($search['normal_finish'])
-        {
-            if($search['normal_finish'] == 1)
-                $args[] = array('AND',"normal_finish = 1");
+        if ($search['normal_finish']) {
+            if ($search['normal_finish'] == 1)
+                $args[] = array('AND', "normal_finish = 1");
             else
-                $args[] = array('AND',"normal_finish = 0");
+                $args[] = array('AND', "normal_finish = 0");
         }
-        if($search['userischeck'])
-        {
-            if($search['userischeck'] == 1)
-                $args[] = array('AND',"userischeck = 1");
+        if ($search['userischeck']) {
+            if ($search['userischeck'] == 1)
+                $args[] = array('AND', "userischeck = 1");
             else
-                $args[] = array('AND',"userischeck = 0");
+                $args[] = array('AND', "userischeck = 0");
         }
-        $users = $this->user->getUserList($page,100,$args);
-        $this->tpl->assign('users',$users);
-        $this->tpl->assign('search',$search);
-        $this->tpl->assign('u',$u);
-        $this->tpl->assign('page',$page);
-    	$this->tpl->display('student_index');
+        $users = $this->user->getUserList($page, 100, $args);
+        $this->tpl->assign('users', $users);
+        $this->tpl->assign('search', $search);
+        $this->tpl->assign('u', $u);
+        $this->tpl->assign('page', $page);
+        $this->tpl->display('student_index');
     }
 }
 

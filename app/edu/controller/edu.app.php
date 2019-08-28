@@ -5,7 +5,7 @@
  * To change the template for this generated file go to
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
-include ("../../../info/connect_mysql.php");
+include("../../../info/connect_mysql.php");
 
 //require_once dirname(__FILE__) . '/../../../medoo/Medoo.php';
 
@@ -498,6 +498,8 @@ class action extends app
         $this->tpl->assign('plans',$plans);
         $this->tpl->display('edu_index');
     }
+
+
 }
 
 
