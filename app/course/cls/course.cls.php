@@ -26,7 +26,7 @@ class course_course
         return $this->db->fetchAll($sql,'csid');
 	}
 
-	public function getCourseList($args,$page,$number = 20,$order = 'cstime DESC,csid DESC')
+	public function getCourseList($args,$page,$number = 20,$order = 'CONVERT(cstitle using gbk) COLLATE gbk_chinese_ci ASC ')
 	{
 		$data = array(
 			'select' => false,
@@ -34,7 +34,7 @@ class course_course
 			'query' => $args,
 			'orderby' => $order
 		);
-		$r = $this->db->listElements($page,$number,$data);
+		$r = $this->db->listAllElements($data);
 		return $r;
 	}
 	

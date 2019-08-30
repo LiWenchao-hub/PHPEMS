@@ -183,8 +183,18 @@
 		$sql = $this->sql->makeSelect($data,$tablepre);
 		$t = $this->fetch($sql);
 		$pages = $pg->outPage($pg->getPagesNumber($t['number'],$number),$page);
+
 		$r['pages'] = $pages;
 		$r['number'] = $t['number'];
+		return $r;
+	}
+
+	public function listAllElements($args,$tablepre = DTH){
+		if(!is_array($args))return false;
+		$r = array();
+		$data = array($args['select'],$args['table'],$args['query'],$args['groupby'],$args['orderby']);
+		$sql = $this->sql->makeSelect($data,$tablepre);
+		$r['data'] = $this->fetchAll($sql,$args['index'],$args['serial']);
 		return $r;
 	}
 
