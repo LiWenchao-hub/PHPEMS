@@ -292,6 +292,10 @@
             columns: [{
                 checkbox: false,
                 visible: false                  //是否显示复选框
+            },{
+                field: 'num',
+                title: '序号',
+                sortable: true
             }, {
                 field: 'usertruename',
                 title: '姓名',

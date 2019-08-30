@@ -189,6 +189,14 @@ class user_user
 		return $r;
 	}
 
+	public function getAllUserList($args=1,$orderby = 'CONVERT( usertruename USING gbk ) COLLATE gbk_chinese_ci ASC '){
+		$r = array();
+		$data = array(false,'user',$args,false,$orderby,false);
+		$sql = $this->pdosql->makeSelect($data);
+		$r['data'] = $this->db->fetchALL($sql,false,'userinfo');
+		return $r;
+	}
+
 	//user group functions
 	public function getGroupById($groupid)
 	{

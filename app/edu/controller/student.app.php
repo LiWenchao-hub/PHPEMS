@@ -106,10 +106,9 @@ class action extends app
     private function documentQuery()
     {
         $type = $this->ev->get('type');
-        $page = $this->ev->get('page') ? $this->ev->get('page') : 1;
         $search = $this->ev->get('search');
         $args = array();
-        $args[] = array('AND', "usergroupid IN (8,10)");
+        $args[] = array('AND', "usergroupid=8");
         $args[] = array('AND', "usersequence =  :usersequence", "usersequence", $this->cuser['usersequence']);
         //用户姓名
         if ($search["0"]['value']) {
@@ -140,10 +139,12 @@ class action extends app
         if ($search["6"]['value']) {
             $args[] = array('AND', "normal_studyLevel = :normal_studyLevel", 'normal_studyLevel', $search["6"]['value']);
         }
-        $users = $this->user->getUserList($page, 100, $args);
-
+        $users = $this->user->getAllUserList($args);
+        $j=1;
         foreach ($users["data"] as &$val) {
             $normal_schID = $val["normal_schID"];
+            $val["num"]=$j;
+            $j++;
             $normal_schID_length = strlen($normal_schID);
             $normal_schID_array = str_split($normal_schID);
             $normal_studyLevel_num = "";//学号第七位表示学历层次
@@ -165,6 +166,7 @@ class action extends app
                     $val["normal_studyType"] = "函授";
                 }
             }
+
         }
         if ($type == "1") {//导出
             $objPHPExcel = new PHPExcel();//定义objPHPExcel对象
