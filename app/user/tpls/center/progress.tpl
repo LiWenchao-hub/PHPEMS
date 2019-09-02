@@ -41,8 +41,8 @@
 
 
 				<?php
-						
-						
+
+
 
 
 //     进度条显示函数
@@ -142,7 +142,7 @@
 								$progress=[(int)$row['finish'],(int)$row['total']];
 							}
 
-						
+
 						$progressPercent=round($progress[0]*100/($progress[1]),2);
 						//echo round($progress[1]*100/($progress[0]+$progress[1]),2)."<br>";
 						//echo $progressPercent;
@@ -152,14 +152,14 @@
 						mysqli_close($conn);
 						}
 
-				
+
 						//echo $this->tpl_var['_user']['userid']."<br>";
 						//echo "sqlProgress=".$sqlProgress."<br>";
-						
-						 
 
 
-//课程有效期函数						
+
+
+//课程有效期函数
 
 					function ClassPeriod($userid,$coursecsid){
 
@@ -216,7 +216,7 @@
 						 //var_dump($raw);
 						 //echo "</pre>";
 
-						 
+
 
 						 if($raw){
 						 //echo "ok";
@@ -250,8 +250,8 @@ echo date("Y-m-d", strtotime("+3 Years")) . "<br>";
 					}
 
 
-						
-						
+
+
 
 ?>
 
@@ -288,10 +288,10 @@ echo date("Y-m-d", strtotime("+3 Years")) . "<br>";
 							//	echo date("Y-m-d",strtotime($myTime[1]))."<br>";
 
 ?>
-							
+
 							<td style="font-size: 9pt"><?php    echo date("Y-m-d",strtotime($myTime[0])) ;                          ?></td>
 							<td style="font-size: 9pt"><?php    echo date("Y-m-d",strtotime($myTime[1]))  ;                         ?></td>
-							
+
 							<!--td>{x2;$status[v:progress['prstatus']]}</td-->
 							<td>
 
@@ -299,14 +299,14 @@ echo date("Y-m-d", strtotime("+3 Years")) . "<br>";
 
 							  <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow=" <?php echo $P; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $P; ?>%">
 							    <font class="text text-danger" >
-							     
+
 							     <?php echo $P; ?>%
 
 
-							     <?php 
+							     <?php
 							     	/*
-							     	
-							     	echo $P."%  距离结课时间还有".date_diff(date("Y/m/d"), date("Y/m/d",strtotime($myTime[1])))->format("%R%a 天"); 
+
+							     	echo $P."%  距离结课时间还有".date_diff(date("Y/m/d"), date("Y/m/d",strtotime($myTime[1])))->format("%R%a 天");
 							     	echo date("Y/m/d");
 							     	echo strtotime($myTime[1]);
 							     	echo date("Y/m/d",strtotime($myTime[1]))."<br>";
@@ -314,7 +314,7 @@ echo date("Y-m-d", strtotime("+3 Years")) . "<br>";
 							     	echo date_diff("2018/12/20","2019/07/12");
 
 
-							     	 */			   
+							     	 */
 
 
 							     ?>
@@ -328,7 +328,7 @@ echo date("Y-m-d", strtotime("+3 Years")) . "<br>";
 							</td>
 
 							<td  style="font-size: 9pt">
-								<?php 
+								<?php
 								//echo $this->tpl_var['_user']['userid']."<br>";
 								//echo $this->tpl_var['courses'][$progress['prscourseid']]['csid']."<br>";
 								//ClassProgress($this->tpl_var['_user']['userid'],$this->tpl_var['courses'][$progress['prscourseid']]['csid']);
@@ -338,22 +338,17 @@ echo date("Y-m-d", strtotime("+3 Years")) . "<br>";
 								$myTime=ClassPeriod($this->tpl_var['_user']['userid'],$this->tpl_var['courses'][$progress['prscourseid']]['csid']);
 								//echo date("Y-m-d",strtotime($myTime[0]))."<br>";
 								//echo date("Y-m-d",strtotime($myTime[1]))."<br>";
-
-
 								if($myTime[2]) {
 										echo " 自选课程";
-
 								}
 								else
 								{
 									$diff=date_diff(date_create(date("Y/m/d")),date_create($myTime[1]));
-									
+
 									echo " <span class='glyphicon glyphicon-star' aria-hidden='true' style='color:#ff0000'></span>必修课程";
 
 									echo "<br>您的可用学习时间还有".$diff->format("%R%a 天");
-
 								}
-
 								?>
 							</td>
 						</tr>
@@ -367,7 +362,5 @@ echo date("Y-m-d", strtotime("+3 Years")) . "<br>";
 	</div>
 </div>
 {x2;include:footer}
-
-
 </body>
 </html>

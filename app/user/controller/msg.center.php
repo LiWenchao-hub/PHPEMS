@@ -38,14 +38,27 @@ class action extends app
 
 	private function index()
 	{
-		$page = $this->ev->get('page')?$this->ev->get('page'):1;
-		$user = $this->user->getUserById($this->_user['sessionuserid']);
-		$msgs = $this->edu->getMyMsgList($user,$page);
-		$this->tpl->assign('msgs',$msgs);
-		$this->tpl->assign('page',$page);
+//		$page = $this->ev->get('page')?$this->ev->get('page'):1;
+//		$user = $this->user->getUserById($this->_user['sessionuserid']);
+//		$msgs = $this->edu->getMyMsgList($user,$page);
+//		$this->tpl->assign('msgs',$msgs);
+//		$this->tpl->assign('page',$page);
 		$this->tpl->display('msg');
 	}
 
+	/*系统消息查询*/
+	private function msgInfoQuery(){
+
+		$user = $this->user->getUserById($this->_user['sessionuserid']);
+		$msgs = $this->edu->getMyMsgAllList($user);
+		$i=1;
+		foreach ($msgs["data"] as &$val){
+			$val["num"]=$i;
+			$i++;
+		}
+		echo json_encode($msgs["data"]);
+		exit;
+	}
 }
 
 

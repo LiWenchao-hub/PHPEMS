@@ -254,6 +254,22 @@ class edu_edu
         );
         return $this->db->listElements($page,$number,$data);
     }
+
+
+    public function getMyMsgAllList($user,$order = "msgtime desc"){
+
+        $args = array();
+        $args[] = array("AND","(msggroups = 0 AND msgusers = 0)");
+        $args[] = array("OR","(find_in_set(:NumberID,msgusers))","NumberID",$user['NumberID']);
+        $args[] = array("OR","(find_in_set(:major,msggroups))","major","{$user['normal_favor']}-{$user['userreferrer']}");
+        $data = array(
+            'select' => array("msgid","msgtitle","DATE_FORMAT(FROM_UNIXTIME(msgtime),'%Y-%m-%d %H:%i:%s') msgtime"),
+            'table' => 'msg',
+            'query' => $args,
+            'orderby' => $order
+        );
+        return $this->db->listAllElements($data);
+    }
 }
 
 ?>
