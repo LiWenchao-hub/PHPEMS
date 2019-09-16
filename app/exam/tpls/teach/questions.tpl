@@ -1,233 +1,560 @@
 {x2;if:!$userhash}
-{x2;include:header}
+{x2;include:header_table}
+<style>
+    .theadClassesStyle {
+        font-size: 14px;
+        color: #5c5c5c;
+    }
+
+    .theadClassesStyle_sub {
+        font-size: 10px;
+        color: #5c5c5c;
+    }
+
+    .card-view-title {
+        font-size: 8px;
+    }
+
+    .card-view-value {
+        font-size: 10px;
+    }
+
+    .bootstrap-table .fixed-table-toolbar .bs-bars {
+        width: 100%;
+    }
+
+    .bootstrap-table .fixed-table-toolbar .bs-bars, .bootstrap-table .fixed-table-toolbar .search, .bootstrap-table .fixed-table-toolbar .columns {
+        margin-bottom: 2px;
+    }
+
+    .input-group-addon {
+        /*background:#337ab7;*/
+        /*color: #ffffff*/
+    }
+
+    .form-control {
+        height: 30px;
+        font-size: 12px;
+    }
+
+
+</style>
 <body>
 {x2;include:nav}
 <div class="container-fluid">
-	<div class="row-fluid">
-		<div class="main">
-			<div class="col-xs-2" style="padding-top:10px;margin-bottom:0px;">
-				{x2;include:menu}
-			</div>
-			<div class="col-xs-10" id="datacontent">
-{x2;endif}
-				<div class="box itembox" style="margin-bottom:0px;border-bottom:1px solid #CCCCCC;">
-					<div class="col-xs-12">
-						<ol class="breadcrumb">
-							<li><a href="index.php?{x2;$_app}-teach">{x2;$apps[$_app]['appname']}</a></li>
-							<li><a href="index.php?{x2;$_app}-teach-questions">试题管理</a></li>
-							<li class="active">普通试题管理</li>
-						</ol>
-					</div>
-				</div>
-				<div class="box itembox" style="padding-top:10px;margin-bottom:0px;">
-					<h4 class="title" style="padding:10px;">
-						普通试题管理
-						<span class="pull-right">
-							<a data-toggle="dropdown" class="btn btn-primary" href="#">添加试题 <strong class="caret"></strong></a>
-							<ul class="dropdown-menu">
-								<li><a href="index.php?{x2;$_app}-teach-questions-addquestion&page={x2;$page}{x2;$u}">单题添加</a></li>
-								<li><a href="index.php?{x2;$_app}-teach-questions-filebataddquestion&page={x2;$page}{x2;$u}">CSV导入</a></li>
-							</ul>
-						</span>
-					</h4>
-					<form action="index.php?exam-teach-questions" method="post" class="form-inline">
-						<table class="table">
-							<thead>
-				                <tr>
-							        <th colspan="2">搜索</th>
-							        <th></th>
-							        <th></th>
-							        <th></th>
-							        <th></th>
-				                </tr>
-				            </thead>
-							<tr>
-								<td>
-									试题ID：
-								</td>
-								<td>
-									<input name="search[questionid]" class="form-control" size="10" type="text" class="number" value="{x2;$search['questionid']}"/>
-								</td>
-								<td>
-									录入时间：
-								</td>
-								<td>
-									<input class="form-control datetimepicker" data-date="{x2;date:TIME,'Y-m-d'}" data-date-format="yyyy-mm-dd" type="text" name="search[stime]" size="10" id="stime" value="{x2;$search['stime']}"/> - <input class="form-control datetimepicker" data-date="{x2;date:TIME,'Y-m-d'}" data-date-format="yyyy-mm-dd" size="10" type="text" name="search[etime]" id="etime" value="{x2;$search['etime']}"/>
-								</td>
-								<td>
-									关键字：
-								</td>
-								<td>
-									<input class="form-control" name="search[keyword]" size="10" type="text" value="{x2;$search['keyword']}"/>
-								</td>
-							</tr>
-					        <tr>
-								<td>
-									科目：
-								</td>
-								<td>
-					        		<select name="search[questionsubjectid]" class="combox form-control" target="sectionselect" refUrl="?exam-teach-questions-ajax-getsectionsbysubjectid&subjectid={value}">
-						        		<option value="0">选择科目</option>
-								  		{x2;tree:$subjects,subject,sid}
-								  		<option value="{x2;v:subject['subjectid']}"{x2;if:v:subject['subjectid'] == $search['questionsubjectid']} selected{x2;endif}>{x2;v:subject['subject']}</option>
-								  		{x2;endtree}
-							  		</select>
-					        	</td>
-					        	<td>
-									章节：
-								</td>
-								<td>
-							  		<select name="search[questionsectionid]" class="combox form-control" id="sectionselect" target="knowsselect" refUrl="?exam-teach-questions-ajax-getknowsbysectionid&sectionid={value}">
-							  		<option value="0">选择章节</option>
-							  		{x2;if:$sections}
-							  		{x2;tree:$sections,section,sid}
-							  		<option value="{x2;v:section['sectionid']}"{x2;if:v:section['sectionid'] == $search['questionsectionid']} selected{x2;endif}>{x2;v:section['section']}</option>
-							  		{x2;endtree}
-							  		{x2;endif}
-							  		</select>
-					        	</td>
-					        	<td>
-									知识点：
-								</td>
-								<td>
-							  		<select name="search[questionknowsid]" id="knowsselect" class="form-control">
-								  		<option value="">选择知识点</option>
-								  		{x2;if:$knows}
-								  		{x2;tree:$knows,know,kid}
-								  		<option value="{x2;v:know['knowsid']}"{x2;if:v:know['knowsid'] == $search['questionknowsid']} selected{x2;endif}>{x2;v:know['knows']}</option>
-								  		{x2;endtree}
-								  		{x2;endif}
-							  		</select>
-					        	</td>
-							</tr>
-							<tr>
-								<td>
-									录入人：
-								</td>
-					        	<td>
-					        		<input class="form-control" name="search[username]" size="10" type="text" value="{x2;$search['username']}"/>
-					        	</td>
-					        	<td>
-									试题类型：
-								</td>
-								<td>
-									<select name="search[questiontype]" class="form-control">
-								  		<option value="0">类型不限</option>
-								  		{x2;tree:$questypes,questype,qid}
-								  		<option value="{x2;v:questype['questid']}">{x2;v:questype['questype']}</option>
-								  		{x2;endtree}
-							  		</select>
-								</td>
-								<td>
-									难度：
-								</td>
-								<td>
-									<select name="search[questionlevel]" class="form-control">
-								  		<option value="0">难度不限</option>
-										<option value="1"{x2;if:$search['questionlevel'] == 1} checked{x2;endif}>易</option>
-										<option value="2"{x2;if:$search['questionlevel'] == 2} checked{x2;endif}>中</option>
-										<option value="3"{x2;if:$search['questionlevel'] == 3} checked{x2;endif}>难</option>
-							  		</select>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2">
-									<button class="btn btn-primary" type="submit">搜索</button>
-									<input type="hidden" value="1" name="search[argsmodel]" />
-								</td>
-								<td colspan="4"></td>
-							</tr>
-						</table>
-					</form>
-					<form action="index.php?exam-teach-questions-batdel" method="post">
-						<fieldset>
-							<table class="table table-hover table-bordered">
-								<thead>
-									<tr class="info">
-					                    <th width="32"><input type="checkbox" class="checkall" target="delids"/></th>
-					                    <th width="40">ID</th>
-								        <th width="80">试题类型</th>
-								        <th>试题内容</th>
-								        <th width="140">录入人/录入时间</th>
-								        <th width="140">删除人/删除时间</th>
-								        <th width="48">难度</th>
-								        <th width="100">操作</th>
-					                </tr>
-					            </thead>
-					            <tbody>
-				                    {x2;tree:$questions['data'],question,qid}
-							        <tr>
-										<td><input type="checkbox" name="delids[{x2;v:question['questionid']}]" value="1"></td>
-										<td>
-											{x2;v:question['questionid']}
-										</td>
-										<td>
-											{x2;$questypes[v:question['questiontype']]['questype']}
-										</td>
-										<td>
-											<a title="查看试题" class="selfmodal" href="javascript:;" url="index.php?exam-teach-questions-detail&questionid={x2;v:question['questionid']}" data-target="#modal">{x2;substring:strip_tags(html_entity_decode(v:question['question'])),135}</a>
-										</td>
-										<td>
-											{x2;v:question['questionusername']}<br />{x2;date:v:question['questioncreatetime'],'Y-m-d'}
-										</td>
-										<td>
-                                            {x2;if:v:question['questiondeler']}{x2;v:question['questiondeler']}<br />{x2;date:v:question['questiondeltime'],'Y-m-d'}{x2;endif}
-										</td>
-										<td>
-											{x2;if:v:question['questionlevel']==2}中{x2;elseif:v:question['questionlevel']==3}难{x2;elseif:v:question['questionlevel']==1}易{x2;endif}
-										</td>
-										<td>
-											<div class="btn-group">
-					                    		<a class="btn" href="index.php?exam-teach-questions-modifyquestion&page={x2;$page}&questionid={x2;v:question['questionid']}{x2;$u}" title="修改"><em class="glyphicon glyphicon-edit"></em></a>
-												<a class="btn confirm" href="index.php?exam-teach-questions-delquestion&questionparent=0&page={x2;$page}&questionid={x2;v:question['questionid']}{x2;$u}" title="删除"><em class="glyphicon glyphicon-remove"></em></a>
-					                    	</div>
-										</td>
-							        </tr>
-							        {x2;endtree}
-					        	</tbody>
-					        </table>
-					        <div class="form-group">
-					            <div class="col-sm-9">
-						            <label class="radio-inline">
-						                <input type="radio" name="action" value="delete" checked/>删除
-						            </label>
-						            {x2;tree:$search,arg,sid}
-						            <input type="hidden" name="search[{x2;v:key}]" value="{x2;v:arg}"/>
-						            {x2;endtree}
-						            <label class="radio-inline">
-						            	<button class="btn btn-primary" type="submit">提交</button>
-						            </label>
-						            <input type="hidden" name="page" value="{x2;$page}"/>
-						        </div>
-					        </div>
-					        <ul class="pagination pull-right">
-					            {x2;$questions['pages']}
-					        </ul>
-				        </fieldset>
-					</form>
-				</div>
-			</div>
-{x2;if:!$userhash}
-		</div>
-	</div>
+    <div class="row-fluid">
+        <div class="main">
+            <div class="col-xs-2" style="padding-top:10px;margin-bottom:0px;">
+                {x2;include:menu}
+            </div>
+            <div class="col-xs-10" id="datacontent">
+                {x2;endif}
+                <div class="box itembox" style="margin-bottom:0px;border-bottom:1px solid #CCCCCC;">
+                    <div class="col-xs-12">
+                        <ol class="breadcrumb">
+                            <!--<li><a href="index.php?{x2;$_app}-teach">{x2;$apps[$_app]['appname']}</a></li>-->
+                            <li><a href="index.php?{x2;$_app}-teach">教师中心</a></li>
+                            <li class="active">试题管理</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="box itembox" style="">
+                    <div id="toolbar">
+                        <form class="form-inline" id="query_form">
+                            <div>
+
+                                <div class="form-group">
+
+                                    <label class="sr-only" for="questionsubjectid">所属科目</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">所属科目</div>
+                                        <select style="width: 180px;" class="form-control" name="questionsubjectid"
+                                                id="questionsubjectid">
+                                            <option id="subject_option_zero" value="0">不限</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="questionknowsid">知识点</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">知识点</div>
+                                        <select style="width: 120px;" class="form-control" name="questionknowsid"
+                                                id="questionknowsid">
+                                            <option id="questionknows_option_zero" value="0">不限</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="normal_favor">试题类型</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">试题类型</div>
+                                        <select style="width: 120px;" class="form-control" name="questiontype"
+                                                id="questiontype">
+                                            <option value="0" id="questiontype_option_zero">不限</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="questionlevel">试题难度</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">试题难度</div>
+                                        <select style="width: 120px;" class="form-control" name="questionlevel"
+                                                id="questionlevel">
+                                            <option value="0">不限</option>
+                                            <option value="1">易</option>
+                                            <option value="2">中</option>
+                                            <option value="3">难</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!--<div class="form-group">
+                                    <label class="sr-only" for="questionusername">&emsp;录入人</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">&emsp;录入人</div>
+                                        <input style="width:180px;" type="text" class="form-control"
+                                               name="questionusername" id="questionusername" placeholder="请输入录入人..."/>
+                                    </div>
+                                </div>-->
+
+                                <hr style="margin-top:5px;padding:0px;background: #337ab7;border:none;height:1px;">
+                                <div style="float: right;margin-right:20px;" class="btn-group">
+                                    <button type="button" id="query" class="btn btn-primary  btn-sm">&emsp;<span
+                                                class='glyphicon glyphicon-search'></span>&nbsp;查询&emsp;
+                                    </button>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-success  btn-sm dropdown-toggle"
+                                                data-toggle="dropdown">
+                                            &emsp;<span class='glyphicon glyphicon-plus'></span>&nbsp;新增
+                                            <span class="caret"></span>&emsp;
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="index.php?{x2;$_app}-teach-questions-addquestion&page={x2;$page}{x2;$u}">单题添加</a></li>
+                                            <li><a href="index.php?{x2;$_app}-teach-questions-filebataddquestion&page={x2;$page}{x2;$u}">批量导入</a></li>
+                                        </ul>
+                                    </div>
+                                    <button type="button" class="btn btn-danger btn-sm"><span
+                                                class='glyphicon  glyphicon-trash'></span>&nbsp;批量删除
+                                    </button>
+                                </div>
+
+                            </div>
+                        </form>
+
+                    </div>
+
+                    <table id="questioninfo_tab" class="table table-hover"></table>
+                </div>
+            </div>
+            {x2;if:!$userhash}
+        </div>
+    </div>
 </div>
-<div id="modal" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button aria-hidden="true" class="close" type="button" data-dismiss="modal">×</button>
-				<h4 id="myModalLabel">
-					试题详情
-				</h4>
-			</div>
-			<div class="modal-body"></div>
-			<div class="modal-footer">
-				 <button aria-hidden="true" class="btn btn-primary" data-dismiss="modal">关闭</button>
-			</div>
-		</div>
-	</div>
-</div>
+
 {x2;include:footer}
 </body>
+<script type="text/javascript">
+    $(function () {
+        InitMainTable();
+        setQuestionTypeList();
+        setSubject();
+    });
+    /*查询按钮点击事件*///search
+    $("#query").click(function () {
+        $('#questioninfo_tab').bootstrapTable(('refresh'));
+        $("#query_form").serializeArray();
+    });
+
+    //将试题类型放入下拉列表中
+    function setQuestionTypeList() {
+        var $questions_type_lists = getQuestionType();
+        for (var i = 0; i < $questions_type_lists.length; i++) {
+            $("#questiontype_option_zero").after('<option value="' + $questions_type_lists[i].questid + '">' + $questions_type_lists[i].questype + '</option>');
+        }
+    }
+
+    //科目
+    function setSubject() {
+        var subject_datas = getSubject();
+        // console.log(subject_datas);
+        for (var i = 0; i < subject_datas.length; i++) {
+            $("#subject_option_zero").after('<option value="' + subject_datas[i].subjectid + '">' + subject_datas[i].subject + '</option>');
+        }
+    }
+
+    //得到科目列表信息
+    function getSubject() {
+        var subject_data = "";
+        $.ajax({
+            type: "POST",
+            dataType: "JSON",
+            url: "index.php?exam-teach-questions-getSubject",
+            async: false,
+            cache: false,
+            success: function (data) {
+                subject_data = data;
+            },
+            error: function (data) {
+
+            }
+        });
+        return subject_data;
+    }
+
+    //初始化questiontype
+    function getQuestionType() {
+        var questiontype_data = "";
+        $.ajax({
+            type: "POST",
+            dataType: "JSON",
+            url: "index.php?exam-teach-questions-getQuestionType",
+            async: false,
+            cache: false,
+            success: function (data) {
+                questiontype_data = data;
+            },
+            error: function (data) {
+
+            }
+        });
+        return questiontype_data;
+    };
+
+
+    //当科目改变时候触发的事件
+    $('#questionsubjectid').on('change', function () {
+        $("#questionknows_option_zero").nextAll().remove();
+        // $("#questionsubjectid").val("0");
+        var questionsubjectid = $("#questionsubjectid").val();
+        var questionknows_data = getQuestionknows(questionsubjectid);
+        setQuestionknows(questionknows_data);
+    });
+
+    function setQuestionknows(questionknows_data) {
+        for (var i = 0; i < questionknows_data.length; i++) {
+            $("#questionknows_option_zero").after('<option value="' + questionknows_data[i].knowsid + '">' + questionknows_data[i].knows + '</option>');
+        }
+    }
+
+    //初始化知识点
+    function getQuestionknows(questionsubjectid) {
+        var questionknows_data = "";
+        $.ajax({
+            type: "POST",
+            dataType: "JSON",
+            url: "index.php?exam-teach-questions-getQuestionknows",
+            async: false,
+            cache: false,
+            data: {
+                questionsubjectid: questionsubjectid
+            },
+            success: function (data) {
+                questionknows_data = data;
+            },
+            error: function (data) {
+
+            }
+        });
+        return questionknows_data;
+    };
+
+
+    var $table; //记录页面bootstrap-table全局变量$table，方便应用
+
+
+    //初始化bootstrap-table的内容
+    function InitMainTable() {
+        var queryUrl = 'index.php?exam-teach-questions-queryQuestionsData';
+        // var fromdata = $("#query_form").serializeArray();
+        $table = $('#questioninfo_tab').bootstrapTable({
+            url: queryUrl,                       //请求后台的URL（*）
+            method: 'get',                      //请求方式（*）
+            toolbar: '#toolbar',                //工具按钮用哪个容器
+            // toolbarAlign:'right',               //工具栏对齐方式
+            // buttonsAlign:'right',               //按钮对齐方式
+            striped: true,                      //是否显示行间隔色
+            cache: true,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: true,                   //是否显示分页（*）
+            // sortable: true,                     //是否启用排序
+            // sortOrder: "asc",                   //排序方式
+            sidePagination: "server",           //分页方式:client客户端分页,server服务端分页
+            pageNumber: 1,                      //初始化加载第一页,默认第一页,并记录
+            pagination: true,                    //是否分页
+            queryParamsType: 'limit',
+            queryParams: queryParams,
+            pageSize: 10,                       //每页的记录行数
+            pageList: [10, 25, 50, 100],        //可供选择的每页的行数
+            // search: true,                    //是否显示表格搜索
+            // strictSearch: true,
+            // showColumns: true,                  //是否显示所有的列（选择显示的列）
+            // showRefresh: true,                  //是否显示刷新按钮
+            // minimumCountColumns: 2,             //最少允许的列数
+            // clickToSelect: true,                //是否启用点击选中行
+            height: 500,                           //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+            uniqueId: "questionid",                //每一行的唯一标识，一般为主键列
+            // showToggle: true,                   //是否显示详细视图和列表视图的切换按钮
+            // cardView: true,                    //是否显示详细视图
+            detailView: true,                  //是否显示父子表
+            // //得到查询的参数
+            // contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            //注册加载子表的事件.注意下这里的三个参数!row会传递数据到子表.
+            onExpandRow: function (index, row, $detail) {
+                InitSubTable(index, row, $detail);
+            },
+
+            //处理服务器返回的数据
+            responseHandler: function (result) {
+
+                if (result.total != 0) {
+                    var row = result.rows;
+                    return {
+                        "rows": row,
+                        "total": result.total
+                    };
+
+                } else {
+                    return {
+                        "rows": [],
+                        "total": 0
+                    };
+                }
+            },
+            rowStyle: rowStyle,//设置行样式
+            theadClasses: 'theadClassesStyle',
+            columns: [{
+                checkbox: true,
+                visible: true                  //是否显示复选框
+            }, {
+                field: 'num',
+                title: '序号'
+            }, {
+                field: 'questionid',
+                title: '试题ID',
+                width: 100
+            }, {
+                field: 'question',
+                title: '试题内容',
+                formatter: questionhandler,
+                width: 200
+            }, {
+                field: 'questionusername',
+                title: '录入人/录入时间',
+                width: 150,
+                formatter: inputpersonhandler
+            }, {
+                field: 'questiondeler',
+                title: '删除人/删除时间',
+                width: 150,
+                formatter: removepersonhandler
+            }, {
+                field: 'questionlevel',
+                title: '难度',
+                align: 'center',
+                formatter: questionlevelhandler
+            }, {
+                field: 'questionid',
+                title: '操作',
+                width: 200,
+                align: 'center',
+                valign: 'middle',
+                formatter: linkFormatter
+            },],
+
+
+            onLoadSuccess: function (data) {
+
+            },
+
+            onLoadError: function () {
+
+            },
+        });
+
+        //请求服务数据时所传参数
+        function queryParams(params) {
+            return {
+                //每页多少条数据
+                pageSize: params.limit,
+                //从那条数据开始
+                offset: params.offset,
+                search: $("#query_form").serializeArray()
+            }
+        };
+
+        //初始化子表格(无线循环)
+        InitSubTable = function (index, row, $detail) {
+            var questionid = row.questionid;
+            var curtable = $detail.html('<table ></table>').find('table');
+            $(curtable).bootstrapTable({
+                url: 'index.php?exam-teach-questions-ajaxDetail',
+                method: 'POST',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                queryParams: {questionid: questionid},
+                ajaxOptions: {questionid: questionid},
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: false,                   //是否显示分页（*）
+                sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+                uniqueId: "questionid",                //每一行的唯一标识，一般为主键列
+                cardView: true,                    //是否显示详细视图
+                rowStyle: rowStyle,//设置行样式
+                theadClasses: 'theadClassesStyle_sub',
+                columns: [{
+                    checkbox: false,
+                    visible: false//是否显示复选框
+                }, {
+                    field: 'subject',
+                    title: '所属科目'
+                }, {
+                    field: 'section',
+                    title: '所属章节'
+                }, {
+                    field: 'knows',
+                    title: '所属知识点',
+                    formatter: knowshandler
+                }, {
+                    field: 'question',
+                    title: '标题',
+                    formatter: sub_questionhandler
+                }, {
+                    field: 'questionselect',
+                    title: '备选项',
+                    formatter: questionselecthandler
+                }, {
+                    field: 'questionanswer',
+                    title: '答案'
+                }, {
+                    field: 'questiondescribe',
+                    title: '解析'
+                }, {
+                    field: 'questionlevel',
+                    title: '难度',
+                    formatter: sub_questionlevelhandler
+                }],
+                //无线循环取子表，直到子表里面没有记录
+                onExpandRow: function (index, row, $Subdetail) {
+                    InitSubTable(index, row, $Subdetail);
+                },
+                onLoadSuccess: function (data) {
+                },
+            });
+        };
+    };
+
+
+    function rowStyle(row, index) {
+        var style = { };
+        style ={css:{'font-size':'12px'}};
+        return style;
+    }
+
+    /*试题内容控制器*/
+    function questionhandler(value, row, index) {
+        var htmlStr = escape2Html(value);
+        var str = htmlStr.replace(/<\/?[^>]*>/g, ''); //去除HTML标签
+        str = str.replace(/[|]*\n/, '') //去除行尾空格
+        return str;
+    }
+
+    /*详细信息标题控制器*/
+    function sub_questionhandler(value, row, index) {
+        var htmlStr = escape2Html(value);
+        var str = htmlStr.replace(/<\/?[^>]*>/g, ''); //去除HTML标签
+        str = str.replace(/[|]*\n/, '') //去除行尾空格
+        return str;
+    }
+
+    function questionselecthandler(value, row, index) {
+        var htmlStr = escape2Html(value);
+        var str = htmlStr.replace(/<\/?[^>]*>/g, ''); //去除HTML标签
+        str = str.replace(/[|]*\n/, '') //去除行尾空格
+        return str;
+    }
+
+    /*录入人和录入时间控制器*/
+    function inputpersonhandler(value, row, index) {
+        var questioncreatetime = $.myTime.UnixToDate(row.questioncreatetime);
+        if (value && row.questioncreatetime) {
+            return value + "/" + questioncreatetime;
+        } else {
+            return "";
+        }
+    }
+
+    /*删除人和删除时间控制器*/
+    function removepersonhandler(value, row, index) {
+        var questiondeltime = $.myTime.UnixToDate(row.questiondeltime);
+        if (value && row.questiondeltime) {
+            return value + "/" + questiondeltime;
+        } else {
+            return "";
+        }
+    }
+
+    /*难度控制器*/
+    function questionlevelhandler(value, row, index) {
+
+        if (value == "1") {
+            return "易";
+        } else if (value == "2") {
+            return "中";
+        } else if (value == "3") {
+            return "难";
+        } else {
+            return "";
+        }
+    }
+
+    /*详细信息子标签控制器*/
+    function sub_questionlevelhandler(value, row, index) {
+        if (value == "1") {
+            return "易";
+        } else if (value == "2") {
+            return "中";
+        } else if (value == "3") {
+            return "难";
+        } else {
+            return "";
+        }
+    }
+
+    function knowshandler(value, row, index) {
+        var knows = row.questionknowsid["0"].knows;
+        return knows;
+    }
+
+    /*操作控制器*/
+    function linkFormatter(value, row, index) {
+        var str = "<button type='button' onclick='onClickEditButton(" + row.questionid + ");' class='btn btn-primary btn-xs'>\n" +
+            "<span class='glyphicon glyphicon-edit'></span>&nbsp;修改\n" +
+            "</button>";
+        str += "<button style='margin-left:10px;' type='button' onclick='onClickRemoveButton(" + row.questionid + ");' class='btn btn-danger btn-xs'>\n" +
+            "<span class='glyphicon  glyphicon-trash'></span>&nbsp;删除\n" +
+            "</button>";
+        return str;
+    }
+
+    /*修改试题按钮单击事件*/
+    function onClickEditButton(questionid) {
+        location.href = "index.php?exam-teach-questions-modifyquestion&questionid=" + questionid;
+    }
+
+    /*删除试题按钮单击事件*/
+    function onClickRemoveButton(questionid) {
+        location.href = "index.php?exam-teach-questions-delquestion&questionparent=0&questionid=" + questionid;
+    }
+
+    //该方法将转义字符转换为普通的HTML标签
+    function escape2Html(str) {
+        var arrEntities ={'lt':'<','gt':'>','nbsp':' ','amp':'&','quot':'"'};
+        return str.replace(/&(lt|gt|nbsp|amp|quot);/ig, function (all, t){return arrEntities[t];});
+    }
+
+    //给查询按钮添加点击事件
+    $("#query").click(function () {
+
+    });
+
+
+</script>
 </html>
 {x2;endif}
