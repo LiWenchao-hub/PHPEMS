@@ -816,7 +816,7 @@ class exam_exam
     //得到试题类型列表
     public function getQuestionTypeList()
     {
-        $data = array(false, 'questype', false, array("questid ASC"), false);
+        $data = array(false, 'questype', false, array("questid DESC"), false);
         $sql = $this->pdosql->makeSelect($data);
         return $this->db->fetchAll($sql);
     }
