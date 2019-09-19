@@ -5,6 +5,7 @@
  * To change the template for this generated file go to
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
+include("../../../info/connect_mysql.php");
 class action extends app
 {
     public function display()
@@ -105,59 +106,46 @@ class action extends app
 
     /*手动添加试题(新)*/
     private function addquestion(){
-        /*if ($this->ev->get('insertquestion')) {
-            $type = $this->ev->get('type');
-            $questionparent = $this->ev->get('questionparent');
-            //批量添加
-            if ($type) {
-                $page = $this->ev->get('page');
-                $content = $this->ev->get('content');
-                $this->exam->insertQuestionBat($content, $questionparent);
-            }else {//单个添加
-                $args = $this->ev->get('args');
-                $targs = $this->ev->get('targs');
-                if (!$questionparent) $questionparent = $args['questionparent'];
-                $questype = $this->basic->getQuestypeById($args['questiontype']);
-                $args['questionuserid'] = $this->_user['userid'];
-                if ($questype['questsort']) $choice = 0;
-                else $choice = $questype['questchoice'];
-                $args['questionanswer'] = $targs['questionanswer' . $choice];
-                if (is_array($args['questionanswer'])) $args['questionanswer'] = implode('', $args['questionanswer']);
-                $page = $this->ev->get('page');
-                $args['questioncreatetime'] = TIME;
-                $args['questionusername'] = $this->_user['username'];
-                $this->exam->addQuestions($args);
-            }
-            if ($questionparent) {
-                $this->exam->resetRowsQuestionNumber($questionparent);
-                $message = array(
-                    'statusCode' => 200,
-                    "message" => "操作成功",
-                    "callbackType" => "forward",
-                    "forwardUrl" => "?exam-teach-rowsquestions-rowsdetail&questionid={$questionparent}&page={$page}{$u}"
-                );
-            } else
-                $message = array(
-                    'statusCode' => 200,
-                    "message" => "操作成功",
-                    "callbackType" => "forward",
-                    "forwardUrl" => "?exam-teach-questions&page={$page}{$u}"
-                );
-            exit(json_encode($message));
-        } else {
-            $search = $this->ev->get('search');
-            $questypes = $this->basic->getQuestypeList();
-            $subjects = $this->basic->getSubjectList(array(array('AND', 'find_in_set(subjectid,:subjectid)', 'subjectid', $this->teachsubjects)));
-            $sections = $this->section->getSectionListByArgs(array(array('AND', "sectionsubjectid = :sectionsubjectid", 'sectionsubjectid', $search['questionsubjectid'])));
-            $knows = $this->section->getKnowsListByArgs(array(array('AND', "knowsstatus = 1"), array('AND', "knowssectionid = :knowssectionid", 'knowssectionid', $search['questionsectionid'])));
-            $this->tpl->assign('subjects', $subjects);
-            $this->tpl->assign('sections', $sections);
-            $this->tpl->assign('knows', $knows);
-            $this->tpl->assign('questypes', $questypes);
-            $this->tpl->display('question_add');
-        }*/
+
         $this->tpl->display('question_add');
     }
+
+    /*添加试题-单题添加*/
+    private function questionaddunit(){
+        //得到所有参数
+        $args = $this->ev->get('args');
+        //通过ID查询试题类型信息
+        $questype = $this->basic->getQuestypeById($args['questiontype']);
+        $args['questionuserid'] = $this->_user['userid'];
+        //questsort 为题型分类【0：客观题 1：主观题】
+        //questchoice 选项分类 【1：多选题 2：多选题 3：判断题】
+        if ($questype['questsort']) {
+            $choice = 0;//客观题
+        } else {
+            $choice = $questype['questchoice'];//主观题
+            $questypeid=$questype['questid'];
+        }
+        $args['questionanswer'] = $args['questionanswer'.$questypeid];
+        $args['questioncreatetime'] = TIME;
+        $args['questionusername'] = $this->_user['username'];
+        $rs=$this->exam->addQuestions($args);
+        if($rs){
+            $message = [
+                'statusCode' => 200,
+                'message' => '添加成功',
+                'callbackType' => 'forward'
+            ];
+        }else{
+            $message = [
+                'statusCode' => 500,
+                'message' => '操作失败',
+                'callbackType' => 'forward'
+            ];
+        }
+        echo json_encode($message);
+        exit;
+    }
+
 
 
 
@@ -197,18 +185,64 @@ class action extends app
         $this->G->R($message);
     }
 
-    private function delquestion()
-    {
-        $page = $this->ev->get('page');
+    /*单个删除*/
+    private function delquestion(){
         $questionid = $this->ev->get('questionid');
         $questionparent = $this->ev->get('questionparent');
-        $this->exam->delQuestions($questionid);
-        $message = array(
-            'statusCode' => 200,
-            "message" => "操作成功",
-            "callbackType" => "forward",
-            "forwardUrl" => "index.php?exam-teach-questions&page={$page}{$u}"
-        );
+        $rs=$this->exam->delQuestions($questionid);
+        if($rs){
+            $message = array(
+                'statusCode' => 200,
+                "message" => "删除成功!",
+                "callbackType" => "forward",
+            );
+        }else{
+            $message = array(
+                'statusCode' => 500,
+                "message" => "删除失败!",
+                "callbackType" => "forward",
+            );
+        }
+        exit(json_encode($message));
+    }
+
+    /*批量删除*/
+    private function batchdelquestion(){
+        $questionids = $_POST['questionids'];
+        $args="(";
+        $x=0;
+        foreach ($questionids as &$val){
+            $x++;
+            if(count($questionids)==$x){
+                $args=$args."'".$val."')";
+            }else{
+                $args=$args."'".$val."',";
+            }
+        }
+//        $str = implode(" ','",$questionids);
+//        $questionidsjsonstr=json_encode($questionids);
+//        $args=array(array("AND", "questionid in :questionid", 'questionid', $questionids));
+//        $rs=$this->exam->delQuestionsByArgs($args);
+        $sql = "delete from x2_questions where questionid in  ".$args;
+        $con = mysqli_connect("127.0.0.1", "root", "DRsXT5ZJ6Oi55LPQ", "exam");
+        if (mysqli_connect_errno($con)) {
+            echo "连接 MySQL 失败: " . mysqli_connect_error();
+        }
+        $result = $con->query($sql);
+        mysqli_close($con);
+        if($result){
+            $message = array(
+                'statusCode' => 200,
+                "message" => "批量删除成功!",
+                "callbackType" => "forward",
+            );
+        }else{
+            $message = array(
+                'statusCode' => 500,
+                "message" => "批量删除失败!",
+                "callbackType" => "forward",
+            );
+        }
         exit(json_encode($message));
     }
 

@@ -132,7 +132,7 @@
                                             <li><a href="index.php?{x2;$_app}-teach-questions-filebataddquestion&page={x2;$page}{x2;$u}">批量导入</a></li>
                                         </ul>
                                     </div>
-                                    <button type="button" class="btn btn-danger btn-sm"><span
+                                    <button type="button" id="batchdelbtn" name="batchdelbtn" class="btn btn-danger btn-sm"><span
                                                 class='glyphicon  glyphicon-trash'></span>&nbsp;批量删除
                                     </button>
                                 </div>
@@ -180,6 +180,8 @@
             $("#subject_option_zero").after('<option value="' + subject_datas[i].subjectid + '">' + subject_datas[i].subject + '</option>');
         }
     }
+
+
 
     //得到科目列表信息
     function getSubject() {
@@ -255,6 +257,21 @@
             }
         });
         return questionknows_data;
+    };
+
+
+    toastr.options = {
+        "closeButton": false, //是否显示关闭按钮
+        "debug": false, //是否使用debug模式
+        "positionClass": "toast-top-full-width",//弹出窗的位置
+        "showDuration": "300",//显示的动画时间
+        "hideDuration": "1000",//消失的动画时间
+        "timeOut": "2000", //展现时间
+        "extendedTimeOut": "1000",//加长展示时间
+        "showEasing": "swing",//显示时的动画缓冲方式
+        "hideEasing": "linear",//消失时的动画缓冲方式
+        "showMethod": "fadeIn",//显示时的动画方式
+        "hideMethod": "fadeOut" //消失时的动画方式
     };
 
 
@@ -540,8 +557,62 @@
 
     /*删除试题按钮单击事件*/
     function onClickRemoveButton(questionid) {
-        location.href = "index.php?exam-teach-questions-delquestion&questionparent=0&questionid=" + questionid;
+        // location.href = "index.php?exam-teach-questions-delquestion&questionparent=0&questionid=" + questionid;
+        $.ajax({
+            type: "GET",
+            dataType: "JSON",
+            url: "index.php?exam-teach-questions-delquestion&questionparent=0&questionid="+ questionid,
+            async: false,
+            cache: false,
+            success: function (data) {
+                if(data.statusCode=="200"){
+                    toastr.success(data.message);
+                    $table.bootstrapTable('refresh');
+                }else{
+                    toastr.error(data.message);
+                }
+            },
+            error: function (data) {
+                toastr.error(data.message);
+            }
+        });
+
     }
+
+    /*批量删除点击事件*/
+    $("#batchdelbtn").click(function () {
+        // $('#questioninfo_tab').bootstrapTable(('refresh'));
+        // $("#query_form").serializeArray();
+        var batchlist = $table.bootstrapTable('getAllSelections');
+        var idlists=[];
+        for (var i = 0; i < batchlist.length; i++) {
+            idlists.push(batchlist[i].questionid);
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "JSON",
+            url: "index.php?exam-teach-questions-batchdelquestion",
+            async: false,
+            cache: false,
+            data:{
+                questionids:idlists
+            },
+            success: function (data) {
+                if(data.statusCode=="200"){
+                    toastr.success(data.message);
+                    $table.bootstrapTable('refresh');
+                }else{
+                    toastr.error(data.message);
+                }
+            },
+            error: function (data) {
+                toastr.error(data.message);
+            }
+        });
+
+    });
+
+
 
     //该方法将转义字符转换为普通的HTML标签
     function escape2Html(str) {
@@ -549,10 +620,7 @@
         return str.replace(/&(lt|gt|nbsp|amp|quot);/ig, function (all, t){return arrEntities[t];});
     }
 
-    //给查询按钮添加点击事件
-    $("#query").click(function () {
 
-    });
 
 
 </script>

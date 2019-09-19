@@ -64,7 +64,7 @@ class action extends app
             }
             $args = array('ocuserid' => $userid, 'occourseid' => $p, 'ocendtime' => TIME + 365 * 24 * 3600);
             $this->course->openCourse($args);
-            $this->basic->openBasic(array('obuserid' => $userid, 'obbasicid' => $course[$p]['csbasicid'], 'obendtime' => TIME + 365 * 24 * 3600));
+//            $this->basic->openBasic(array('obuserid' => $userid, 'obbasicid' => $course[$p]['csbasicid'], 'obendtime' => TIME + 365 * 24 * 3600));
         }
         $message = array(
             'statusCode' => 200,

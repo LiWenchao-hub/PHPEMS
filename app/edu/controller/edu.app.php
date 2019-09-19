@@ -77,7 +77,7 @@ class action extends app
             {
                 $args = array('ocuserid'=>$u['userid'],'occourseid'=>$p,'ocendtime' => TIME + 365*24*3600);
                 $this->course->openCourse($args);
-                $this->basic->openBasic(array('obuserid'=>$u['userid'],'obbasicid'=>$course[$p]['csbasicid'],'obendtime' => TIME + 365*24*3600));
+//                $this->basic->openBasic(array('obuserid'=>$u['userid'],'obbasicid'=>$course[$p]['csbasicid'],'obendtime' => TIME + 365*24*3600));
             }
         }
         if(count($users['data']) < 10)
@@ -489,10 +489,10 @@ class action extends app
         //专业名称
         if($search['major'])
             $args[] = array("AND","major like :major","major",'%'."{$search['major']}".'%');
-        /*   
-        echo("<pre>") ;  
+        /*
+        echo("<pre>") ;
         var_dump($args);
-        echo("</pre>") ;  
+        echo("</pre>") ;
         */
         $plans = $this->edu->getPlanList($args,$page);
         $this->tpl->assign('plans',$plans);

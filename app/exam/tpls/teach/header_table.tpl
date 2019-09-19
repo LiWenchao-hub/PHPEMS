@@ -11,7 +11,9 @@
 	<link rel="stylesheet" type="text/css" href="app/core/styles/css/peskin.css" />
 	<link rel="stylesheet" type="text/css" href="app/core/styles/bootstrap-table/bootstrap-table.min.css" />
 	<link rel="stylesheet" type="text/css" href="files/public/images/ali-icon/iconfont.css" />
-	<link rel="stylesheet" href="app/core/styles/bootstrap-validator/css/bootstrapValidator.css"/>
+	<link rel="stylesheet" href="app/core/styles/toastr/toastr.min.css"/>
+	<link rel="stylesheet" href="app/core/styles/jquery-confirm/jquery-confirm.min.css"/>
+
 	<!--[if lt IE 9]>
 	<script src="app/core/styles/js/html5shiv.min.js"></script>
 	<script src="app/core/styles/js/respond.min.js"></script>
@@ -26,6 +28,6 @@
 	<script src="app/core/styles/dateformat/dateFormat.js"></script>
 	<script src="app/core/styles/dateformat/jquery-dateformat.js"></script>
 	<script src="app/core/styles/dateformat/timestampformat.js"></script>
-	<script type="text/javascript" src="app/core/styles/bootstrap-validator/js/bootstrapValidator.min.js"></script>
-	<script type="text/javascript" src="app/core/styles/bootstrap-validator/js/language/zh_CN.js"></script>
+	<script type="text/javascript" src="app/core/styles/toastr/toastr.js"></script>
+	<script type="text/javascript" src="app/core/styles/jquery-confirm/jquery-confirm.min.js"></script>
 </head>
